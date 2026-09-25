@@ -37,7 +37,7 @@ Quando receber **"rodar rotina semanal"**, faça exatamente isto, em ordem.
 ### 0. Ambiente
 
 ```bash
-python3 -m pip install -q -r requirements.txt   # requests, python-dotenv, pyyaml
+python3 -m pip install -q -r requirements.txt -r requirements-images.txt
 git checkout main && git pull
 ```
 
@@ -76,23 +76,42 @@ voz do usuário**. Os ganchos de `.claude/skills/li-post/hooks.json` estão em
 inglês: use a estrutura, escreva em português natural. Entre 400 e 3.000
 caracteres. Sem markdown (o LinkedIn não renderiza `**negrito**`).
 
-### 3.1 Foto (quando fizer sentido)
+### 3.1 Imagem: precisa? Se sim, qual?
 
-As fotos disponíveis ficam em `media/fotos/` (descrições opcionais em
-`media/fotos/CATALOGO.md`). Para cada post:
+Nem todo post precisa de imagem. **No máximo 2 posts por semana com imagem.**
+Decida post a post, nesta ordem:
 
-- Liste as fotos e descarte as já usadas (`grep -r "image:" queue/`).
-- Abra as candidatas com a ferramenta Read (ela mostra a imagem) e escolha uma
-  que combine com o assunto. Se nenhuma combinar, o post sai sem foto. Não
-  force: um post com foto aleatória é pior que um sem foto.
-- **Compliance da foto:** recuse qualquer foto em que dê pra ler código,
-  nomes de sistemas, conversas (Slack/Teams/e-mail), crachá, tela de
-  ferramenta interna, rosto de outra pessoa ou endereço. Se a foto tiver um
-  desses problemas, não use e avise na descrição do PR.
-- No frontmatter: `image: "media/fotos/<arquivo>.jpg"` e `image_alt:` com uma
-  descrição objetiva do que aparece na foto (até 120 caracteres, pra leitor de
-  tela; ex.: "Notebook aberto num terminal ao lado de uma xícara de café").
-- Use foto em 2 ou 3 dos 4 posts da semana, no máximo; varie.
+1. **Precisa?** Só se a imagem explicar algo que o texto sozinho explica mal:
+   um fluxo (diagrama), um antes/depois de código, um print que prova o que
+   o post conta. Opinião e história costumam ir sem imagem.
+2. **Já existe?** Veja `media/fotos/` (e `CATALOGO.md`), descarte as já usadas
+   (`grep -r "image:" queue/`) e abra as candidatas com a ferramenta Read.
+3. **Dá pra gerar?** Use `scripts/gerar_imagem.py` (instale
+   `requirements-images.txt`):
+   - `diagrama`: fluxo de 2 a 5 caixas a partir de um YAML;
+   - `codigo`: cartão com até 30 linhas de código **genérico, escrito do zero**
+     pra ilustrar o conceito (nunca código da empresa, nem adaptado).
+   Salve a saída como `media/fotos/gerado-<slug>.png` e a fonte (o YAML ou o
+   código) em `media/fotos/fontes/gerado-<slug>.<ext>`: a validação exige a
+   fonte e passa a blocklist nela. Abra a imagem gerada com Read e confira se
+   ficou legível antes de usar.
+4. **Senão, peça ao Luan.** Quando o ideal é um print ou foto real (tela do
+   projeto pessoal, teste passando, o app no celular, o setup), não gere nada:
+   escreva no frontmatter `image_request:` com o que ele deve mandar, e liste
+   no PR. O post pode sair sem a imagem se ele não mandar.
+
+**Nunca:**
+- imagem com cara de gerada por IA (pessoas, cenas, ilustração "artística");
+- print falso: terminal, tela ou resultado de teste inventado é enganoso;
+- imagem baixada da internet (direito autoral);
+- foto ou print em que dê pra ler código, sistema, conversa (Slack/Teams/
+  e-mail), crachá, ferramenta interna, rosto de outra pessoa ou endereço.
+
+No frontmatter, com imagem: `image: "media/fotos/<arquivo>"` e `image_alt:`
+com uma descrição objetiva do que aparece (até 120 caracteres, pra leitor de
+tela; ex.: "Diagrama: dados e evento gravados juntos, worker publica no
+RabbitMQ"). Pedido: `image_request: "Print do app do projeto pessoal na tela
+de correção"`.
 
 ### 4. Humanizar e pontuar
 
@@ -158,7 +177,7 @@ propósito por falta de dado.
 
 ```bash
 git checkout -b semana-AAAA-MM-DD        # data da segunda-feira da semana-alvo
-git add queue/approved/ linkedin/plan.md
+git add queue/approved/ linkedin/plan.md media/fotos/
 git commit -m "posts: semana de AAAA-MM-DD"
 git push -u origin semana-AAAA-MM-DD
 gh pr create --base main --title "Posts da semana de DD/MM" --body-file /tmp/pr.md
@@ -168,13 +187,21 @@ A descrição do PR tem:
 
 - A tabela da semana:
 
-  | dia | horário | tipo | gancho | primeira linha | foto |
+  | dia | horário | tipo | gancho | primeira linha | imagem |
   | --- | --- | --- | --- | --- | --- |
-  | ter 06/10 | 08:15 | PROOF | #17 Time Anchor | Em março eu perdi... | setup-noite.jpg |
+  | ter 06/10 | 08:15 | PROOF | #17 Time Anchor | Em março eu perdi... | gerada: diagrama |
+  | qua 07/10 | 08:00 | OPINION | #1 Contrarian | ... | sem imagem |
+  | qui 08/10 | 07:45 | TEACH | #21 Direct Value | ... | **pedida** |
 
 - A nota do `detect.py` de cada post.
 - Uma seção **"Falta você preencher"** listando cada `{{...}}`, em qual
   arquivo e o que é necessário. Se não houver, diga "Nada a preencher".
+- Uma seção **"Imagens"**: as geradas (com link pro arquivo, pra ele ver no
+  celular) e, pra cada `image_request`, **o que ele deve mandar**: o que
+  mostrar, o que esconder, formato (print ou foto) e em qual post entra.
+  Explique que ele pode mandar a imagem numa sessão do Claude ("adiciona esta
+  imagem no post X do PR N") ou subir em `media/fotos/` pelo GitHub e trocar
+  `image_request` por `image` + `image_alt`. Sem imagem, o post sai só com texto.
 - Um lembrete: "Merge = aprovação. Edite os arquivos direto no PR se quiser
   mudar algo."
 

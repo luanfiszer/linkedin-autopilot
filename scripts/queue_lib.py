@@ -136,7 +136,8 @@ def image_errors(post: Post) -> list[str]:
     rel = post.meta.get("image")
     alt = post.meta.get("image_alt")
     if not rel:
-        return ["image_alt sem image"] if alt else []
+        # image_alt sozinho é permitido quando há image_request (foto pedida ao Luan)
+        return ["image_alt sem image"] if alt and not post.meta.get("image_request") else []
     errs = []
     path = post.image_path
     if not str(rel).startswith("media/fotos/"):

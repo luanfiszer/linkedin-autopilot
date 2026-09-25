@@ -1,0 +1,120 @@
+"""Posts com foto: validação da imagem e upload mockado."""
+from datetime import datetime, timedelta
+
+import pytest
+
+import li_publish
+import queue_lib as q
+from helpers import FakeResponse, write_post
+
+NOW = datetime(2026, 9, 29, 12, 0, tzinfo=q.TZ)
+JPEG_LIMPO = b"\xff\xd8\xff\xdb" + b"\x00" * 200 + b"\xff\xd9"
+JPEG_EXIF = b"\xff\xd8\xff\xe1\x00\x20Exif\x00\x00" + b"\x00" * 200 + b"\xff\xd9"
+
+
+@pytest.fixture
+def foto(tmp_path, monkeypatch):
+    """Aponta a raiz do repo para tmp e cria media/fotos/setup.jpg."""
+    monkeypatch.setattr(q, "ROOT", tmp_path)
+    fotos = tmp_path / "media" / "fotos"
+    fotos.mkdir(parents=True)
+    (fotos / "setup.jpg").write_bytes(JPEG_LIMPO)
+    (fotos / "gps.jpg").write_bytes(JPEG_EXIF)
+    return tmp_path
+
+
+def post_com(tmp_path, image="media/fotos/setup.jpg", alt="Mesa com notebook e monitor"):
+    extra = f'image: "{image}"\n' + (f'image_alt: "{alt}"\n' if alt else "")
+    return q.load(write_post(tmp_path / "approved", NOW - timedelta(hours=1), extra=extra))
+
+
+def test_imagem_valida(foto):
+    assert q.image_errors(post_com(foto)) == []
+
+
+def test_imagem_inexistente(foto):
+    assert "não encontrada" in " ".join(q.image_errors(post_com(foto, image="media/fotos/x.jpg")))
+
+
+def test_imagem_fora_da_pasta(foto):
+    (foto / "x.jpg").write_bytes(JPEG_LIMPO)
+    assert "media/fotos/" in " ".join(q.image_errors(post_com(foto, image="x.jpg")))
+
+
+def test_imagem_com_exif_e_barrada(foto):
+    assert "EXIF" in " ".join(q.image_errors(post_com(foto, image="media/fotos/gps.jpg")))
+
+
+def test_imagem_sem_alt_e_barrada(foto):
+    assert "image_alt" in " ".join(q.image_errors(post_com(foto, alt=None)))
+
+
+def test_formato_nao_suportado(foto):
+    (foto / "media" / "fotos" / "a.webp").write_bytes(b"RIFF")
+    assert "formato" in " ".join(q.image_errors(post_com(foto, image="media/fotos/a.webp")))
+
+
+@pytest.fixture
+def env(foto, monkeypatch):
+    monkeypatch.setenv("LINKEDIN_ACCESS_TOKEN", "tok")
+    monkeypatch.setenv("LINKEDIN_PERSON_URN", "urn:li:person:abc")
+    monkeypatch.delenv("GITHUB_OUTPUT", raising=False)
+    calls = []
+
+    def fake_post(url, headers=None, json=None, timeout=None):
+        calls.append(("POST", url, json))
+        if "initializeUpload" in url:
+            return FakeResponse(200, json_body={"value": {
+                "uploadUrl": "https://upload.example/abc", "image": "urn:li:image:IMG1"}})
+        return FakeResponse(201, {"x-restli-id": "urn:li:share:1"})
+
+    def fake_put(url, data=None, headers=None, timeout=None):
+        calls.append(("PUT", url, len(data)))
+        return FakeResponse(201)
+
+    monkeypatch.setattr(li_publish.requests, "post", fake_post)
+    monkeypatch.setattr(li_publish.requests, "put", fake_put)
+    return foto, calls
+
+
+def run(tmp):
+    return li_publish.run([], now=NOW, approved_dir=tmp / "approved",
+                          published_dir=tmp / "published", log_path=tmp / "log.md")
+
+
+def test_publica_com_imagem(env):
+    tmp, calls = env
+    post = post_com(tmp)
+    assert run(tmp) == 0
+    init, put, create = calls
+    assert init[2] == {"initializeUploadRequest": {"owner": "urn:li:person:abc"}}
+    assert put == ("PUT", "https://upload.example/abc", len(JPEG_LIMPO))
+    assert create[2]["content"] == {"media": {"id": "urn:li:image:IMG1",
+                                              "altText": "Mesa com notebook e monitor"}}
+    moved = q.load(tmp / "published" / post.path.name)
+    assert moved.meta["posted_image_urn"] == "urn:li:image:IMG1"
+
+
+def test_falha_no_upload_nao_cria_post(env, monkeypatch):
+    tmp, calls = env
+    monkeypatch.setattr(li_publish.requests, "put",
+                        lambda *a, **k: FakeResponse(400, text="bad image"))
+    post = post_com(tmp)
+    assert run(tmp) == li_publish.EXIT_FAIL
+    assert not any("rest/posts" in c[1] for c in calls)
+    assert not q.load(post.path).attempted, "erro definitivo limpa o marcador"
+
+
+def test_post_com_imagem_nao_cai_no_fallback_sem_foto(env, monkeypatch):
+    tmp, calls = env
+
+    def fake_post(url, headers=None, json=None, timeout=None):
+        calls.append(("POST", url, json))
+        if "initializeUpload" in url:
+            return FakeResponse(200, json_body={"value": {"uploadUrl": "u", "image": "urn:li:image:I"}})
+        return FakeResponse(403, text="denied")
+
+    monkeypatch.setattr(li_publish.requests, "post", fake_post)
+    post_com(tmp)
+    assert run(tmp) != 0
+    assert not any("ugcPosts" in c[1] for c in calls)

@@ -76,6 +76,24 @@ voz do usuário**. Os ganchos de `.claude/skills/li-post/hooks.json` estão em
 inglês: use a estrutura, escreva em português natural. Entre 400 e 3.000
 caracteres. Sem markdown (o LinkedIn não renderiza `**negrito**`).
 
+### 3.1 Foto (quando fizer sentido)
+
+As fotos disponíveis ficam em `media/fotos/` (descrições opcionais em
+`media/fotos/CATALOGO.md`). Para cada post:
+
+- Liste as fotos e descarte as já usadas (`grep -r "image:" queue/`).
+- Abra as candidatas com a ferramenta Read (ela mostra a imagem) e escolha uma
+  que combine com o assunto. Se nenhuma combinar, o post sai sem foto. Não
+  force: um post com foto aleatória é pior que um sem foto.
+- **Compliance da foto:** recuse qualquer foto em que dê pra ler código,
+  nomes de sistemas, conversas (Slack/Teams/e-mail), crachá, tela de
+  ferramenta interna, rosto de outra pessoa ou endereço. Se a foto tiver um
+  desses problemas, não use e avise na descrição do PR.
+- No frontmatter: `image: "media/fotos/<arquivo>.jpg"` e `image_alt:` com uma
+  descrição objetiva do que aparece na foto (até 120 caracteres, pra leitor de
+  tela; ex.: "Notebook aberto num terminal ao lado de uma xícara de café").
+- Use foto em 2 ou 3 dos 4 posts da semana, no máximo; varie.
+
 ### 4. Humanizar e pontuar
 
 Para cada post, com o texto num arquivo temporário (fora do repo):
@@ -92,7 +110,8 @@ checagem mais fraca, e rode de novo. A nota final vai no `human_score`.
 ### 5. Gravar na fila
 
 Um arquivo por post: `queue/approved/AAAA-MM-DD-HHMM-slug.md` (data e hora
-locais de SP, slug em minúsculas, sem acento, com hífens):
+locais de SP, slug em minúsculas, sem acento, com hífens). `image` e
+`image_alt` são opcionais (ver 3.1):
 
 ```markdown
 ---
@@ -101,6 +120,8 @@ visibility: PUBLIC          # PUBLIC ou CONNECTIONS
 type: PROOF                 # PROOF | OPINION | TEACH | STORY | OFFER
 hook: "#17 Time Anchor"
 human_score: 84
+image: "media/fotos/setup-noite.jpg"
+image_alt: "Notebook aberto num terminal ao lado de uma xícara de café"
 ---
 Texto do post exatamente como deve ser publicado.
 ```
@@ -128,9 +149,9 @@ A descrição do PR tem:
 
 - A tabela da semana:
 
-  | dia | horário | tipo | gancho | primeira linha |
-  | --- | --- | --- | --- | --- |
-  | ter 06/10 | 08:15 | PROOF | #17 Time Anchor | Em março eu perdi... |
+  | dia | horário | tipo | gancho | primeira linha | foto |
+  | --- | --- | --- | --- | --- | --- |
+  | ter 06/10 | 08:15 | PROOF | #17 Time Anchor | Em março eu perdi... | setup-noite.jpg |
 
 - A nota do `detect.py` de cada post.
 - Uma seção **"Falta você preencher"** listando cada `{{...}}`, em qual
@@ -188,10 +209,16 @@ do Mac.
    causa, uma decisão de arquitetura, um trade-off, algo que deu errado.
    Ignore commits triviais (merge, bump, formatação).
 4. Acrescente ao fim de `linkedin/ideias.md` uma seção
-   `## Diário técnico (coleta de AAAA-MM-DD)` com um item por ideia, marcado
-   `[trabalho]` ou `[pessoal]`, no formato:
-   `- [trabalho] Outbox Pattern num consumer RabbitMQ: evento se perdia quando o
-   banco confirmava e a publicação falhava. Aprendi a ...`
+   `## Diário técnico (coleta de AAAA-MM-DD)` com um bloco curto por ideia,
+   fácil de ler no celular, neste formato:
+
+   ```markdown
+   ### [trabalho] Outbox Pattern num consumer RabbitMQ
+   - **Problema:** evento se perdia quando o banco confirmava e a publicação falhava.
+   - **O que fiz:** gravei o evento na mesma transação e publiquei num worker.
+   - **Lição:** salvar e publicar precisam andar juntos, ou um dia um deles falha sozinho.
+   - **Rende post de:** TEACH ou OPINION
+   ```
 5. Confira a blocklist e releia cada item com o teste acima:
    `python3 scripts/validate_queue.py --check-text linkedin/ideias.md`.
    Se aparecer um termo novo da empresa que deveria estar bloqueado, acrescente

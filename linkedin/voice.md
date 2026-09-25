@@ -31,8 +31,20 @@ não há posts publicados.
 ## Como eu falo
 
 - **Posts meus que soam como eu:** [NÃO INFORMADO] (ainda não posto)
-- **Tom:** limpo, claro e natural. Leve, mas não informal demais. Falo direto
-  com a pessoa, em segunda pessoa ("você"), para puxar conversa.
+- **Tom:** leve, limpo e natural, como quem conta pra um colega dev o que
+  aconteceu na semana. Pode ter um pouco de humor e autoironia ("passei duas
+  horas culpando o Redis; era fuso horário"). Nada de tom de palestra ou de
+  relatório. Falo direto com a pessoa, em segunda pessoa ("você").
+- **Estrutura (obrigatória):**
+  - linha 1: o gancho, sozinho, até ~140 caracteres;
+  - parágrafos de 1 a 3 linhas, com linha em branco entre eles;
+  - uma ideia por parágrafo; nada de bloco de texto corrido;
+  - arco: gancho → o que aconteceu → o que eu fiz → o que aprendi → pergunta;
+  - quando houver passos ou itens, lista com hífen (máximo 4 itens, tamanhos
+    diferentes);
+  - termo técnico explicado em meia frase na primeira vez, pra quem é júnior
+    acompanhar;
+  - entre 800 e 1.600 caracteres na maioria dos posts.
 - **Palavras que eu uso:** vocabulário simples. "pra" e "a gente" podem
   aparecer. Termos técnicos em inglês quando é assim que se fala no dia a dia
   (Outbox Pattern, N+1, tracing, deploy).

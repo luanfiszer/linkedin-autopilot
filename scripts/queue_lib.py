@@ -17,6 +17,10 @@ ROOT = Path(__file__).resolve().parent.parent
 APPROVED = ROOT / "queue" / "approved"
 PUBLISHED = ROOT / "queue" / "published"
 LOG = ROOT / "linkedin" / "log.md"
+PHOTOS = ROOT / "media" / "fotos"
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif"}
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
+MAX_ALT_CHARS = 300
 TZ = ZoneInfo("America/Sao_Paulo")
 
 VISIBILITIES = {"PUBLIC", "CONNECTIONS"}
@@ -53,6 +57,11 @@ class Post:
     @property
     def attempted(self) -> bool:
         return bool(self.meta.get("publish_attempted_at"))
+
+    @property
+    def image_path(self) -> Path | None:
+        rel = self.meta.get("image")
+        return (ROOT / str(rel)) if rel else None
 
     @property
     def first_line(self) -> str:
@@ -112,6 +121,39 @@ def schema_errors(post: Post) -> list[str]:
         errs.append(f"human_score precisa ser número: {score!r}")
     if not post.body.strip():
         errs.append("texto do post vazio")
+    errs += image_errors(post)
+    return errs
+
+
+def has_exif(path: Path) -> bool:
+    """JPEG com segmento EXIF (pode ter GPS, modelo do celular, data)."""
+    with open(path, "rb") as fh:
+        head = fh.read(128 * 1024)
+    return head[:2] == b"\xff\xd8" and b"Exif\x00\x00" in head
+
+
+def image_errors(post: Post) -> list[str]:
+    rel = post.meta.get("image")
+    alt = post.meta.get("image_alt")
+    if not rel:
+        return ["image_alt sem image"] if alt else []
+    errs = []
+    path = post.image_path
+    if not str(rel).startswith("media/fotos/"):
+        errs.append(f"image tem que estar em media/fotos/: {rel}")
+    if not path.is_file():
+        return errs + [f"imagem não encontrada: {rel}"]
+    if path.suffix.lower() not in IMAGE_EXTS:
+        errs.append(f"formato de imagem não suportado: {path.suffix} (use jpg, png ou gif)")
+    if path.stat().st_size > MAX_IMAGE_BYTES:
+        errs.append(f"imagem com {path.stat().st_size // 1024} KB; máximo 5 MB "
+                    "(rode scripts/preparar_fotos.py)")
+    if has_exif(path):
+        errs.append(f"imagem com metadados EXIF (podem ter GPS): {rel}. Rode scripts/preparar_fotos.py")
+    if not alt or not str(alt).strip():
+        errs.append("post com image precisa de image_alt (descrição da foto para leitor de tela)")
+    elif len(str(alt)) > MAX_ALT_CHARS:
+        errs.append(f"image_alt com {len(str(alt))} caracteres; máximo {MAX_ALT_CHARS}")
     return errs
 
 

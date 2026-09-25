@@ -3,20 +3,26 @@ scheduled_at: 2026-10-01T07:45:00-03:00
 visibility: PUBLIC
 type: TEACH
 hook: "#11 Myth Bust"
-human_score: 79.6
+human_score: 72.5
 ---
-Redis não é por que evento duplicado continua passando na sua idempotência. O motivo é outro: a janela entre 2 passos que ninguém trata como 1 operação só.
+Idempotência com Redis parece resolvida. Até o processo cair no meio do caminho.
 
-Nesse projeto pessoal que venho construindo, um app que processa upload de áudio, eu usava Redis com SETNX pra garantir que o mesmo upload não fosse processado 2 vezes. Parecia resolvido.
+Estou construindo um projeto pessoal, um app de treino de inglês por conversa de áudio: você fala, o app transcreve, uma IA corrige e responde em voz. App em React Native, backend em Python, fila com worker sobre Redis.
 
-Só que criar o registro do upload e colocar ele na fila são 2 passos separados, e não 1. Se o processo cai bem entre os 2, o registro existe, mas a fila nunca soube dele.
+Um caso bem real.
 
-Nenhuma trava do Redis impede isso. Ela protege o passo de enfileirar. Não protege a janela antes dele.
+A rede do celular cai no meio do upload, o app reenvia o mesmo áudio, e aquela fala não pode ser processada duas vezes, porque cada processamento custa dinheiro de verdade.
 
-A correção foi tirar o Redis dessa parte e usar uma coluna de idempotência direto no Postgres, no mesmo registro que já ia pro banco de qualquer jeito, de forma que criar o registro e marcar ele como pronto pra fila virassem a mesma transação, sem depender de mais nenhum sistema pra isso.
+O plano inicial era usar o SETNX do Redis como trava (um "grava só se ainda não existir").
 
-Se a fila falhar depois, dá pra reprocessar sem duplicar nada.
+Só que o próprio plano já apontava um risco: a janela entre criar o registro no Postgres e colocar o trabalho na fila. Se o processo cai bem ali, a trava do Redis não resolve.
 
-A regra que fica: o banco é a fonte da verdade. Fila e cache são só aceleradores. Quando os 2 discordam, quem manda é o banco.
+Então mudei.
 
-Sua idempotência hoje mora numa trava de cache ou numa transação que não pode ficar pela metade?
+O app passou a mandar uma chave de idempotência num header, e ela foi pra uma coluna do próprio Postgres com índice UNIQUE, no mesmo registro que já ia pro banco. Criar o registro e reservar a chave viraram uma coisa só.
+
+A regra que ficou pra mim:
+- o banco é a fonte da verdade
+- fila e cache aceleram, mas não decidem nada sozinhos
+
+E no seu sistema, a idempotência mora no cache ou no banco?

@@ -3,20 +3,26 @@ scheduled_at: 2026-09-30T08:00:00-03:00
 visibility: PUBLIC
 type: OPINION
 hook: "#1 Contrarian Take"
-human_score: 81.8
+human_score: 75.0
 ---
-Outbox Pattern. Todo mundo acha que é over-engineering pra maioria dos projetos.
+Salvar no banco e publicar o evento logo em seguida parece inofensivo. Não é.
 
-Depois de ver o buraco que ele tapa, acho o contrário.
+No .NET, o código costuma ser um SaveChangesAsync() do EF Core e, na linha de baixo, um publish no RabbitMQ.
 
-O argumento contra é sempre o mesmo: publica o evento direto depois de salvar, sem essa complexidade toda. Só que salvar no banco e publicar na fila são 2 operações separadas, com 2 pontas que podem falhar cada uma por conta própria, e não existe uma transação que cubra as 2 ao mesmo tempo.
+Se você já escreveu isso, provavelmente funciona. Até o dia em que não funciona.
 
-Se o banco confirma e a publicação falha, ninguém percebe na hora. O sistema segue rodando. Os dados ficam inconsistentes. O bug só aparece semanas depois, quando alguém pergunta por que 1 evento nunca chegou.
+São duas operações diferentes, e nenhuma transação cobre as duas. Aí, uma hora:
+- o banco confirma, a publicação falha, e o evento some
+- a publicação sai, o banco faz rollback, e existe um evento sobre algo que nunca foi salvo
 
-Implementei Outbox Pattern com processamento em background e RabbitMQ no trabalho, recentemente: a escrita no Postgres e o registro do evento acontecem na mesma transação, e um processo separado garante a publicação depois.
+Nenhum erro aparece.
 
-Deu mais peça pra manter, sim. Mas tirou uma categoria inteira de bug da mesa.
+O Outbox Pattern resolve isso de um jeito direto: o evento vai pra uma tabela de outbox no mesmo SaveChangesAsync() dos dados, e um hosted service em background lê essa tabela e publica no RabbitMQ. Se falhar, o registro continua lá pra próxima tentativa.
 
-"Simples" só é virtude se o sistema continuar certo quando 1 das 2 pontas falha no meio.
+Eu implementei isso no trabalho há pouco tempo, com health check junto.
 
-Você já viu uma inconsistência dessas aparecer tarde demais pra dar pra saber de onde veio?
+É mais uma peça pra gente manter? É. Mas tira uma categoria inteira de bug da mesa.
+
+Por isso eu não acho que Outbox seja exagero.
+
+Você publica eventos direto do código ou já usa algum tipo de outbox?

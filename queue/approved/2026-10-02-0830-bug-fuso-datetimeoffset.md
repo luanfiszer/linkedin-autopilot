@@ -3,18 +3,26 @@ scheduled_at: 2026-10-02T08:30:00-03:00
 visibility: PUBLIC
 type: STORY
 hook: "#9 Story Cold Open"
-human_score: 71.4
+human_score: 70.1
 ---
-"Isso não devia ser possível. Esse registro é de ontem."
+Um dado antigo estava vencendo um dado novo. O culpado era o fuso horário.
 
-Foi o que pensei olhando pro log, tentando entender por que uma consolidação mais antiga tinha acabado de sobrescrever a mais recente.
+A regra era simples: entre duas versões do mesmo registro, vence a mais recente.
 
-A regra do sistema era simples: entre 2 versões do mesmo dado, vence a mais recente. Só que "mais recente" dependia de comparar 2 valores de data lidos de uma coluna timestamptz no Postgres, e o driver, no modo legado de timestamps, devolvia esses valores no fuso do processo, não em UTC.
+Só que às vezes a versão antiga ganhava.
 
-Nos testes locais, processo e banco rodavam no mesmo fuso. Nunca dava pra ver o problema. Só apareceu quando reproduzi num ambiente com fuso diferente: uma consolidação processada perto da virada do dia, e o mais novo virava mais velho na comparação.
+A causa estava num detalhe do driver do PostgreSQL no .NET: no modo legado de timestamps, um DateTime lido de uma coluna timestamptz voltava convertido pro fuso do processo, e não em UTC como eu esperava.
 
-Troquei os 2 lados pra DateTimeOffset, que carrega o fuso junto com o valor, e escrevi um teste de regressão com a data escrita explicitamente em -03:00, pra garantir que a comparação não dependesse de onde o processo está rodando.
+Na prática, a comparação dependia de onde o código rodava. O mais antigo podia parecer mais novo.
 
-O que ficou: uma regra de "vence o mais recente" e um tipo de data sem fuso não deviam conviver em nenhum sistema.
+E o pior: nos testes locais, nunca apareceu. Só quando eu reproduzi num ambiente de verdade.
 
-Já caçou um bug que só aparecia fora do seu ambiente de teste? O que finalmente entregou a causa?
+O que eu fiz:
+- troquei DateTime por DateTimeOffset, que guarda o fuso junto com a data
+- escrevi um teste de regressão com a data explícita em -03:00, pra esse bug não voltar escondido
+
+Se a regra é "vence o mais recente", a data precisa saber em que fuso está.
+
+Senão, "mais recente" vira questão de sorte.
+
+Qual foi o bug mais difícil de reproduzir que você já pegou?

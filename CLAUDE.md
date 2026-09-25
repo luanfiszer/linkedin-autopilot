@@ -178,7 +178,7 @@ do Mac.
    dias, em todas as branches. Ele commita com mais de uma identidade (e-mail
    pessoal, corporativo e `Luan Fiszer@DESKTOP-...`), então filtre pelo nome,
    não pelo e-mail:
-   `git -C <repo> log --all --no-merges -i --author="luan ?fiszer" --since="8 days ago" --stat`.
+   `git -C <repo> log --all --no-merges -i -E --author="luan ?fiszer" --since="8 days ago" --stat`.
    O mesmo commit pode aparecer duas vezes (rebase/cherry-pick): agrupe pela
    mensagem.
 2. Leia as mensagens e, quando precisar entender a técnica, os diffs

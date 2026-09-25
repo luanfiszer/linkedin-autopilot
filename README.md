@@ -71,10 +71,16 @@ Opcional: a variável de repositório `LINKEDIN_VERSION` (em *Variables*, não e
 desativa cada versão depois de mais ou menos um ano, então atualize esse valor
 uma vez por ano.
 
-### 4. Proteger a main (recomendado)
+### 4. Configurações do repositório
 
-Em **Settings > Branches**, crie uma regra para `main` exigindo Pull Request e
-o check **Validar fila**. **Não** ative "Allow auto-merge".
+- **Não** exija Pull Request nem status check para push na `main` (branch
+  protection ou ruleset): o workflow de publicação dá push direto na `main`
+  para mover o post para `queue/published/` e atualizar o log, e seria
+  bloqueado. A aprovação continua sendo o merge do PR da semana.
+- **Não** ative "Allow auto-merge" (Settings > General).
+- Em **Settings > Actions > General > Workflow permissions**, deixe como está
+  (o workflow pede `contents: write` e `issues: write` sozinho). Só mude para
+  "Read and write" se o push do bot falhar com erro 403.
 
 ### 5. Rotina semanal do Claude
 

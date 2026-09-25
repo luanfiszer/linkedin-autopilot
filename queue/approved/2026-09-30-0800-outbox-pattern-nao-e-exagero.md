@@ -4,6 +4,8 @@ visibility: PUBLIC
 type: OPINION
 hook: "#1 Contrarian Take"
 human_score: 75.0
+image: "media/fotos/gerado-outbox-fluxo.png"
+image_alt: "Diagrama: dados e evento gravados na mesma transação numa tabela outbox; um worker lê e publica no RabbitMQ"
 ---
 Salvar no banco e publicar o evento logo em seguida parece inofensivo. Não é.
 

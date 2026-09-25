@@ -4,6 +4,7 @@ visibility: PUBLIC
 type: TEACH
 hook: "#11 Myth Bust"
 human_score: 72.5
+image_request: "Print do ADR em que você decidiu pôr a idempotência numa coluna do Postgres em vez do Redis (título + contexto). Recorte o nome do projeto e caminhos de pasta."
 ---
 Idempotência com Redis parece resolvida. Até o processo cair no meio do caminho.
 

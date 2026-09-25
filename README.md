@@ -155,9 +155,10 @@ esse endpoint recusar o token self-serve (403, 404 ou 426), ele tenta
 `POST https://api.linkedin.com/v2/ugcPosts`. O endpoint que funcionou fica
 gravado no campo `posted_via` de cada post publicado.
 
-> **Status:** ainda não verificado com um token real. Os dois caminhos estão
-> testados com a API mockada. O primeiro post de teste vai mostrar qual deles
-> funciona com o seu app; anote aqui depois.
+> **Verificado em 25/09/2026:** o `rest/posts` com `LinkedIn-Version: 202609`
+> aceitou o token self-serve (app com "Share on LinkedIn") e devolveu
+> `urn:li:share:...`. O fallback `v2/ugcPosts` não foi necessário. O mesmo token
+> também apaga posts (`DELETE /rest/posts/{urn}` respondeu 204).
 
 ### Little text
 

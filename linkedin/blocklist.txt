@@ -10,3 +10,7 @@ MEDPlanner
 RealizaProva
 CronogramaAcademico
 AutorizacaoConteudos
+# Projeto pessoal: pode ser citado, mas sem o nome
+Voicecoach
+Voice Coach
+english_teacher_bot

@@ -53,13 +53,37 @@ não há posts publicados.
 
 Coisas em que eu acredito e que parte do meu público discorda.
 
-1. [NÃO INFORMADO]
-2. [NÃO INFORMADO]
-3. [NÃO INFORMADO]
+1. **Programar com agente de IA exige mais disciplina, não menos.** O agente
+   não lembra o que foi combinado na sessão anterior, então decisão tem que
+   estar escrita (ADR), regra de arquitetura tem que quebrar o build e
+   comportamento tem que ter teste. Regra que depende de lembrar erode.
+   *Base:* projeto pessoal construído sessão a sessão com agente, com dezenas
+   de ADRs e um registro de aprendizados.
+2. **Publicar evento logo depois de salvar no banco é bug esperando
+   acontecer. Outbox não é exagero.** Se o banco confirma e a publicação falha
+   (ou o contrário), o sistema fica inconsistente sem ninguém perceber.
+   *Base:* implementei Outbox Pattern com processamento em background e
+   RabbitMQ no trabalho (sem citar a empresa).
+3. **Otimização sem medição é chute.** Medir antes, e ter coragem de desfazer
+   uma decisão quando o número desmente a premissa.
+   *Base:* no projeto pessoal, aprovei uma otimização (prompt caching) e
+   derrubei no mesmo dia: a medição mostrou que o prefixo mínimo pra cache
+   engatar era 4.096 tokens, não os 1.024 que eu tinha assumido, e uma conversa
+   real nunca chegava lá. No trabalho, uso tracing (Jaeger) pra achar gargalo
+   antes de mexer.
+
+Outras ideias que viram posts de TEACH (não são posições centrais): teste de
+adapter contra banco de verdade (testcontainers) em vez de banco em memória;
+banco como fonte da verdade e fila/cache como aceleradores (idempotência numa
+coluna do Postgres em vez de Redis); não decidir arquitetura sobre código que
+ainda não existe.
 
 ## Fora dos limites
 
 - **Assuntos sobre os quais eu não posto:** [NÃO INFORMADO]
+- **Projeto pessoal (app de inglês):** pode ser usado à vontade, com números e
+  detalhes técnicos, mas **sem o nome do projeto**. Chame de "meu projeto
+  pessoal" ou "um app que estou construindo" e diga do que se trata.
 - **Empresa atual (MEDGRUPO):** posso falar da **experiência e da tecnologia**,
   de forma rasa, nunca da empresa. Regras:
   - não cite o nome da empresa, de produtos, serviços, repositórios, classes,
@@ -101,6 +125,19 @@ Tudo abaixo está no perfil público. Nada além disso pode virar número num po
   - otimização de queries no PostgreSQL com EF Core;
   - tracing com Jaeger, métricas com Prometheus e Grafana.
 - **Números do MEDGRUPO:** não usar (política acima).
+- **Projeto pessoal (sem citar o nome):** um app de treino de inglês por
+  conversa de áudio com um professor de IA. O aluno fala, o áudio é
+  transcrito, um LLM responde e corrige, e a resposta volta em voz. Backend em
+  Python (eu vim do .NET e aprendi Python nele), app mobile em React
+  Native/Expo, Postgres, Redis, fila com worker, SSE. Construído sessão a
+  sessão com agente de IA, com dezenas de ADRs. Começou no WhatsApp via Twilio
+  e migrou pra app próprio quando o canal virou teto (sem UI, só turn-based,
+  webhook público). Histórias com número:
+  - prompt caching derrubado pela medição (4.096 tokens medidos contra 1.024
+    assumidos);
+  - idempotência do upload numa coluna do Postgres em vez de Redis `SETNX`,
+    por causa de uma janela de crash entre criar o registro e enfileirar;
+  - testes de persistência contra Postgres real em container.
 - **Diário técnico semanal:** `linkedin/ideias.md` recebe toda semana um resumo
   já sanitizado dos meus commits (ver "Coleta semanal" no `CLAUDE.md`). É a
   principal fonte de histórias novas.

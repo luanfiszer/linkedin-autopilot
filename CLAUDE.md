@@ -169,7 +169,8 @@ do Mac.
   descobrir qual sistema, qual regra ou qual número? Se sim, reescreva mais
   genérico ou descarte.
 - Repositórios pessoais (`~/Documents/ProjetosPessoais/*`, exceto este) podem
-  ser citados pelo nome, com link se forem públicos.
+  ser descritos com detalhes e números, mas **sem o nome do projeto** (está na
+  blocklist): "meu projeto pessoal, um app de ..." basta.
 
 **Passos:**
 

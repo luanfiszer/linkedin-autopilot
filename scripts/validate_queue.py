@@ -76,8 +76,15 @@ def validate_post(post: q.Post, now: datetime, lex, blocklist=None) -> list[str]
     placeholders = PLACEHOLDER_RE.findall(post.body + "\n" + post.raw_front)
     if placeholders:
         errs.append("placeholder sem preencher: " + ", ".join(sorted(set(placeholders))))
-    hits = blocked_terms(post.body + "\n" + str(post.meta.get("hook", "")),
-                         load_blocklist() if blocklist is None else blocklist)
+    texts = [post.body, str(post.meta.get("hook", "")), str(post.meta.get("image_alt", ""))]
+    img = post.image_path
+    if img is not None and img.name.startswith("gerado-"):
+        fontes = sorted((q.PHOTOS / "fontes").glob(img.stem + ".*"))
+        if not fontes:
+            errs.append(f"imagem gerada sem fonte: falta media/fotos/fontes/{img.stem}.<ext> "
+                        "(o código ou YAML que gerou a imagem)")
+        texts += [f.read_text(encoding="utf-8", errors="ignore") for f in fontes]
+    hits = blocked_terms("\n".join(texts), load_blocklist() if blocklist is None else blocklist)
     if hits:
         errs.append("termo proibido pela blocklist (compliance): " + ", ".join(hits))
     _, score, verdict = detect.run(post.body, lex, "pt")

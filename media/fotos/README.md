@@ -1,16 +1,34 @@
-# Fotos para os posts
+# Imagens dos posts
 
-Coloque as fotos originais em `media/entrada/` (essa pasta **não** vai para o
-GitHub) e rode:
+Nem todo post precisa de imagem: no máximo 2 por semana. A rotina decide post a
+post e faz uma destas três coisas:
+
+- **gera** um diagrama ou um cartão de código genérico (`scripts/gerar_imagem.py`),
+  com cara de material técnico, nunca de IA;
+- **usa** um print ou foto que você já deixou nesta pasta;
+- **pede** a você, no PR, exatamente o que mandar (`image_request`).
+
+Nunca: imagem gerada por IA, print falso, imagem da internet.
+
+## Prints
+
+Print de tela (PNG) pode vir direto: celular e Mac não gravam localização em
+print. Antes de mandar, confira que não aparece nada do trabalho, nem
+notificação, nem nome de outra pessoa. Bons prints: o app do seu projeto
+pessoal rodando, testes passando no terminal do projeto pessoal, um trecho de
+documentação ou ADR seu, um gráfico de medição.
+
+## Fotos
+
+Foto de celular guarda a localização GPS. Coloque as originais em
+`media/entrada/` (essa pasta **não** vai para o GitHub) e rode:
 
 ```bash
 .venv/bin/python scripts/preparar_fotos.py
 ```
 
-O script reduz para 2000 px, corrige a rotação e **remove os metadados** (a foto
-do celular guarda a localização GPS de onde foi tirada). O resultado vai para
-esta pasta. Depois é só commitar. Se quiser, descreva cada foto numa linha do
-`CATALOGO.md`; a rotina usa isso e olha a foto pra escolher.
+O script reduz para 2000 px, corrige a rotação e remove os metadados. Depois é
+só commitar. Descreva cada uma no `CATALOGO.md` se quiser.
 
 ## Ideias de fotos
 

@@ -118,3 +118,37 @@ def test_post_com_imagem_nao_cai_no_fallback_sem_foto(env, monkeypatch):
     post_com(tmp)
     assert run(tmp) != 0
     assert not any("ugcPosts" in c[1] for c in calls)
+
+
+def test_image_request_sozinho_e_valido(foto):
+    extra = 'image_request: "Print do app na tela de correção"\nimage_alt: "App mostrando correção"\n'
+    post = q.load(write_post(foto / "approved", NOW, extra=extra))
+    assert q.image_errors(post) == []
+
+
+def test_imagem_gerada_exige_fonte_e_passa_blocklist(foto, monkeypatch):
+    import validate_queue
+    monkeypatch.setattr(q, "PHOTOS", foto / "media" / "fotos")
+    (foto / "media" / "fotos" / "gerado-x.png").write_bytes(b"\x89PNG" + b"\x00" * 50)
+    post = post_com(foto, image="media/fotos/gerado-x.png")
+    lex = validate_queue.detect.load_lexicon("pt")
+    errs = validate_queue.validate_post(post, NOW - timedelta(days=1), lex, blocklist=["MEDSoft"])
+    assert any("sem fonte" in e for e in errs)
+    fontes = foto / "media" / "fotos" / "fontes"
+    fontes.mkdir()
+    (fontes / "gerado-x.yml").write_text("caixas: [MEDSoft.Service.Aulas, fila]", encoding="utf-8")
+    errs = validate_queue.validate_post(post, NOW - timedelta(days=1), lex, blocklist=["MEDSoft"])
+    assert not any("sem fonte" in e for e in errs)
+    assert any("blocklist" in e for e in errs)
+
+
+def test_gerador_produz_png_sem_exif(tmp_path):
+    import gerar_imagem
+    try:
+        out = gerar_imagem.render_diagram({"titulo": "T", "caixas": ["A", "B longo demais pra caber"]},
+                                          tmp_path / "d.png")
+        code = gerar_imagem.render_code("var x = 1;", "csharp", "X.cs", tmp_path / "c.png")
+    except SystemExit as exc:
+        pytest.skip(f"sem fonte TrueType neste ambiente: {exc}")
+    assert out.name == "gerado-d.png" and code.name == "gerado-c.png"
+    assert out.read_bytes()[:4] == b"\x89PNG"

@@ -174,10 +174,13 @@ do Mac.
 **Passos:**
 
 1. Para cada repositório em `~/Documents/MEDGRUPO/` e
-   `~/Documents/ProjetosPessoais/`, pegue o e-mail do autor com
-   `git -C <repo> config user.email` e liste os commits dele dos últimos 8
-   dias, em todas as branches:
-   `git -C <repo> log --all --since="8 days ago" --author="<email>" --stat`.
+   `~/Documents/ProjetosPessoais/`, liste os commits do Luan dos últimos 8
+   dias, em todas as branches. Ele commita com mais de uma identidade (e-mail
+   pessoal, corporativo e `Luan Fiszer@DESKTOP-...`), então filtre pelo nome,
+   não pelo e-mail:
+   `git -C <repo> log --all --no-merges -i --author="luan ?fiszer" --since="8 days ago" --stat`.
+   O mesmo commit pode aparecer duas vezes (rebase/cherry-pick): agrupe pela
+   mensagem.
 2. Leia as mensagens e, quando precisar entender a técnica, os diffs
    (`git -C <repo> show <sha>`). Isso fica só na sessão; nada é copiado.
 3. Escolha de 3 a 8 coisas que renderiam post: um padrão aplicado, um bug e a

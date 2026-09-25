@@ -107,6 +107,25 @@ Reescreva à mão as estruturas sinalizadas no relatório. Se a nota
 (`HUMAN SCORE`) ficar **abaixo de 70**, reescreva o post, atacando primeiro a
 checagem mais fraca, e rode de novo. A nota final vai no `human_score`.
 
+**Não engane o detector.** Subir a nota com truques piora o post:
+
+- número pequeno que não é dado vai por extenso ("duas operações", não "2
+  operações"); o detector nem conta algarismo solto;
+- SPECIFICITY baixa se resolve com detalhe técnico real (o nome do método, da
+  lib, do tipo, do padrão), nunca com número ou nome inventado;
+- BURSTINESS baixa se resolve variando frases: uma bem curta, uma longa;
+- VOICE baixa se resolve falando com o leitor ("você") e em primeira pessoa.
+
+**Fidelidade aos fatos (erros que já aconteceram):**
+
+- nada de fala entre aspas, cena ou detalhe que não está na fonte ("Isso não
+  devia ser possível", "perto da virada do dia");
+- nada de motivo, justificativa ou contexto inventado ("foi escopo pequeno");
+- plano não é fato: se a fonte diz que algo foi planejado, não escreva que
+  "eu usava";
+- releia cada frase do post contra a fonte antes de gravar. Frase sem fonte
+  sai.
+
 ### 5. Gravar na fila
 
 Um arquivo por post: `queue/approved/AAAA-MM-DD-HHMM-slug.md` (data e hora

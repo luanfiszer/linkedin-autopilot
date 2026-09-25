@@ -2,7 +2,9 @@
 """Gera um access token do LinkedIn para o seu perfil (OAuth 2.0, 3 pernas).
 
 Rode localmente, nunca no Actions:
-  python scripts/get_token.py
+  python scripts/get_token.py               # imprime token e URN
+  python scripts/get_token.py --gh-secrets  # grava direto nos secrets do GitHub
+                                            # (via gh CLI) e só mostra o token mascarado
 
 Precisa de LINKEDIN_CLIENT_ID e LINKEDIN_CLIENT_SECRET no .env, e do redirect
 URI http://localhost:8000/callback cadastrado no app do LinkedIn Developers.
@@ -11,8 +13,10 @@ O token só é impresso no terminal. Este script não grava nada em disco.
 """
 from __future__ import annotations
 
+import argparse
 import os
 import secrets
+import subprocess
 import sys
 import threading
 import webbrowser
@@ -79,7 +83,25 @@ def wait_for_callback(expected_state: str) -> str:
     return result["code"]
 
 
+def set_gh_secret(name: str, value: str) -> None:
+    """gh secret set lendo o valor do stdin: nada vai para argv nem para disco."""
+    r = subprocess.run(["gh", "secret", "set", name], input=value, text=True,
+                       cwd=ROOT, capture_output=True)
+    if r.returncode != 0:
+        sys.exit(f"Falha no gh secret set {name}: {r.stderr.strip()}")
+    print(f"  secret {name} atualizado no GitHub")
+
+
+def mask(value: str) -> str:
+    return value[:4] + "..." + value[-4:] if len(value) > 12 else "***"
+
+
 def main():
+    ap = argparse.ArgumentParser(description="Gera o access token do LinkedIn.")
+    ap.add_argument("--gh-secrets", action="store_true",
+                    help="grava LINKEDIN_ACCESS_TOKEN e LINKEDIN_PERSON_URN nos secrets do repo "
+                         "via gh CLI, sem imprimir o token")
+    args = ap.parse_args()
     load_dotenv(ROOT / ".env")
     client_id = os.environ.get("LINKEDIN_CLIENT_ID", "").strip()
     client_secret = os.environ.get("LINKEDIN_CLIENT_SECRET", "").strip()
@@ -125,6 +147,14 @@ def main():
     print(f"Escopos:         {data.get('scope', SCOPES)}")
     print(f"Expira em:       {expires_at:%d/%m/%Y %H:%M} ({expires_in // 86400} dias)")
     print("=" * 64)
+    if args.gh_secrets:
+        print(f"\nLINKEDIN_PERSON_URN={urn}")
+        print(f"LINKEDIN_ACCESS_TOKEN={mask(token)}  (não impresso)\n")
+        set_gh_secret("LINKEDIN_ACCESS_TOKEN", token)
+        set_gh_secret("LINKEDIN_PERSON_URN", urn)
+        print(f"\nPronto. Renove o token antes de {expires_at:%d/%m/%Y}.")
+        return
+
     print(f"\nLINKEDIN_PERSON_URN={urn}")
     print(f"LINKEDIN_ACCESS_TOKEN={token}")
     print("\nCadastre estes 2 secrets no GitHub (Settings > Secrets and variables > Actions),")

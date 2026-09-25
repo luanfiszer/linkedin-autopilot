@@ -59,7 +59,9 @@ secret**. Cadastre:
 | `LINKEDIN_ACCESS_TOKEN` | o token impresso pelo `get_token.py` |
 | `LINKEDIN_PERSON_URN` | `urn:li:person:...` |
 
-Ou pela CLI (cola o valor quando pedir):
+Atalho: `python scripts/get_token.py --gh-secrets` faz a autorização e grava
+os dois secrets direto pelo `gh`, sem imprimir o token. Ou pela CLI, colando
+o valor quando pedir:
 
 ```bash
 gh secret set LINKEDIN_ACCESS_TOKEN
@@ -123,8 +125,7 @@ workflow abre a issue **"Token do LinkedIn expirou"** (uma só, atualizada a
 cada falha) e os posts ficam esperando na fila; nada se perde.
 
 ```bash
-python scripts/get_token.py
-gh secret set LINKEDIN_ACCESS_TOKEN
+python scripts/get_token.py --gh-secrets
 ```
 
 Depois rode o workflow na mão (**Actions > Publicar no LinkedIn > Run

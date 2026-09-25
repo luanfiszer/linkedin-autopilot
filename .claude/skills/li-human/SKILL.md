@@ -25,6 +25,29 @@ plain-English replacements, 17 invisible character classes, 11 typographic
 substitutions, and 11 structural tells. It is meant to be edited. If the user
 has a word they always use that the lexicon strips, remove it from the file.
 
+## Português do Brasil (padrão neste repo)
+
+Os dois scripts aceitam `--lang pt|en` e usam **`pt` por padrão** neste
+repositório. Com `pt`, eles leem `slop_pt.json`:
+
+- `words` e `phrases`: substituídos automaticamente (alavancar, robusto,
+  "no cenário atual", "vale ressaltar que", "a verdade é que"...). Expressão
+  apagada no início da frase faz a próxima palavra virar maiúscula.
+- `flag_only`: termos que às vezes são legítimos (jornada, ecossistema,
+  fundamental...). Só sinalizados, com sugestão. Nunca trocados sozinhos.
+- `structures`: "Não é apenas X, é Y", "Não é sobre X. É sobre Y.", "E o
+  melhor de tudo?", perguntas retóricas curtas numa linha, tríades, listas com
+  emoji, parede de hashtags, iscas de engajamento. Só sinalizados.
+
+A checagem VOICE em PT troca "contrações" por marcas de fala natural: primeira
+pessoa, "a gente", "pra", "tá", e a mistura de frases curtas (≤ 6 palavras)
+com longas (≥ 18). Invisíveis e travessões funcionam igual ao original.
+
+```bash
+python3 humanize.py draft.txt --lang pt --report
+python3 detect.py draft.txt --lang pt
+```
+
 ## What gets fixed automatically
 
 **1. Invisible characters.** Zero-width spaces and joiners, word joiners,

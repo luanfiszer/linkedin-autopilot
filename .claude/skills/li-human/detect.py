@@ -19,6 +19,14 @@ Usage
   pbpaste | python3 detect.py -
   python3 detect.py draft.txt --json
   python3 detect.py before.txt after.txt      # compare two drafts
+  python3 detect.py draft.txt --lang en       # English lexicon and checks
+
+Language
+  --lang pt (the default in this repo) reads slop_pt.json and swaps the
+  English-only signals for Brazilian Portuguese ones: the VOICE check looks
+  for natural-speech markers (first person, "a gente", "pra", short sentences
+  mixed with long ones) instead of contractions. FINGERPRINT is identical in
+  both languages.
 """
 
 import argparse
@@ -31,6 +39,8 @@ import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEX = os.path.join(HERE, "slop.json")
+LEXICONS = {"en": LEX, "pt": os.path.join(HERE, "slop_pt.json")}
+DEFAULT_LANG = "pt"
 
 SENT_RE = re.compile(r"[^.!?\n]+[.!?]*")
 WORD_RE = re.compile(r"[A-Za-z']+")
@@ -38,6 +48,16 @@ CONTRACTIONS = re.compile(r"\b\w+'(?:s|t|re|ve|ll|d|m)\b", re.IGNORECASE)
 PRONOUNS = re.compile(r"\b(i|me|my|mine|we|us|our|you|your)\b", re.IGNORECASE)
 NUMBERS = re.compile(r"\b\d[\d,.]*%?\b|\$\d")
 PROPER = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
+
+# Brazilian Portuguese. Letters include accents; numbers include R$.
+WORD_RE_PT = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*")
+NUMBERS_PT = re.compile(r"\b\d[\d.,]*%?|R\$\s?\d")
+PROPER_PT = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-ZÀ-Ý][a-zà-ÿ]{2,}\b", re.MULTILINE)
+# "nos" is left out on purpose: it is usually em + os, not a pronoun.
+PRONOUNS_PT = re.compile(r"\b(?:eu|me|mim|meu|minha|meus|minhas|comigo|nós|nosso|nossa|"
+                         r"nossos|nossas|a gente|você|vocês|te|contigo)\b", re.IGNORECASE)
+SPOKEN_PT = re.compile(r"\b(?:pra|pro|pras|pros|tá|tô|tava|tavam|né|a gente|cê|aí|daí|"
+                       r"tipo assim|bora|beleza|pô|dá pra|num|numa)\b", re.IGNORECASE)
 
 
 def clamp(n):
@@ -55,8 +75,8 @@ def sentences(text):
     return [s.strip() for s in SENT_RE.findall(text) if len(s.split()) > 2]
 
 
-def words(text):
-    return WORD_RE.findall(text)
+def words(text, lang="en"):
+    return (WORD_RE_PT if lang == "pt" else WORD_RE).findall(text)
 
 
 def check_burstiness(text):
@@ -70,25 +90,27 @@ def check_burstiness(text):
     return score, f"variation {cv:.2f} across {len(lens)} sentences (want 0.55+)"
 
 
-def check_specificity(text):
+def check_specificity(text, lang="en"):
     """Numbers, names and concrete nouns. Slop is abstract."""
-    w = words(text)
+    w = words(text, lang)
     if len(w) < 25:
         return 50.0, "too short to judge"
     per100 = 100 / len(w)
-    hits = len(NUMBERS.findall(text)) + len(set(PROPER.findall(text)))
+    numbers, proper = (NUMBERS_PT, PROPER_PT) if lang == "pt" else (NUMBERS, PROPER)
+    hits = len(numbers.findall(text)) + len(set(proper.findall(text)))
     density = hits * per100
     score = scale(density, human=6.0, machine=0.5)
     return score, f"{hits} concrete markers, {density:.1f} per 100 words (want 4+)"
 
 
-def check_slop(text, lex):
+def check_slop(text, lex, lang="en"):
     """Stock vocabulary density against the lexicon."""
-    w = words(text)
+    w = words(text, lang)
     if not w:
         return 50.0, "empty"
     hits, found = 0, []
-    for entry in lex["words"] + lex["phrases"]:
+    # flag_only terms are never auto-replaced, but they still read as stock.
+    for entry in lex["words"] + lex["phrases"] + lex.get("flag_only", []):
         pattern = re.compile(r"\b" + re.escape(entry["find"]).replace(r"\ ", r"\s+") + r"\b",
                              re.IGNORECASE)
         n = len(pattern.findall(text))
@@ -118,14 +140,7 @@ def check_fingerprint(text):
     return score, detail
 
 
-def check_voice(text, lex):
-    """Contractions, person, and the shapes models default to."""
-    w = words(text)
-    if len(w) < 25:
-        return 50.0, "too short to judge"
-    per100 = 100 / len(w)
-    contractions = len(CONTRACTIONS.findall(text)) * per100
-    person = len(PRONOUNS.findall(text)) * per100
+def structure_tells(text, lex):
     tells = 0
     names = []
     for s in lex["structures"]:
@@ -136,8 +151,53 @@ def check_voice(text, lex):
         if n:
             tells += n
             names.append(s["id"])
+    return tells, names
+
+
+def uniform_bullets(text):
     bullets = [len(b.split()) for b in re.findall(r"(?m)^\s*[-*•]\s+(.+)$", text)]
-    uniform = (len(bullets) >= 3 and statistics.pstdev(bullets) < 1.6)
+    return len(bullets) >= 3 and statistics.pstdev(bullets) < 1.6
+
+
+def check_voice_pt(text, lex):
+    """Brazilian Portuguese has no contractions check: it uses spoken markers
+    ("pra", "a gente", "tá"), person, a mix of short and long sentences, and
+    the structures models default to."""
+    w = words(text, "pt")
+    if len(w) < 25:
+        return 50.0, "curto demais para julgar"
+    per100 = 100 / len(w)
+    spoken = len(SPOKEN_PT.findall(text)) * per100
+    person = len(PRONOUNS_PT.findall(text)) * per100
+    lens = [len(s.split()) for s in SENT_RE.findall(text) if s.split()]
+    short = sum(1 for n in lens if n <= 6)
+    long_ = sum(1 for n in lens if n >= 18)
+    mix = (50.0 if len(lens) < 4 else (short > 0) * 50.0 + (long_ > 0) * 50.0)
+    tells, names = structure_tells(text, lex)
+    score = (scale(spoken, human=1.5, machine=0.0) * 0.20
+             + scale(person, human=6.0, machine=0.5) * 0.30
+             + mix * 0.20
+             + clamp(100 - tells * 22) * 0.30)
+    if uniform_bullets(text):
+        score -= 12
+        names.append("uniform-bullets")
+    detail = (f"{spoken:.1f} marcas de fala, {person:.1f} pronomes pessoais por 100 palavras, "
+              f"{short} frase(s) curta(s) / {long_} longa(s), {tells} tell(s) estrutural(is)")
+    if names:
+        detail += " [" + ", ".join(names[:4]) + "]"
+    return clamp(score), detail
+
+
+def check_voice(text, lex):
+    """Contractions, person, and the shapes models default to."""
+    w = words(text)
+    if len(w) < 25:
+        return 50.0, "too short to judge"
+    per100 = 100 / len(w)
+    contractions = len(CONTRACTIONS.findall(text)) * per100
+    person = len(PRONOUNS.findall(text)) * per100
+    tells, names = structure_tells(text, lex)
+    uniform = uniform_bullets(text)
     score = (scale(contractions, human=3.0, machine=0.0) * 0.35
              + scale(person, human=8.0, machine=1.0) * 0.35
              + clamp(100 - tells * 22) * 0.30)
@@ -154,13 +214,18 @@ def check_voice(text, lex):
 CHECKS = ["BURSTINESS", "SPECIFICITY", "SLOP DENSITY", "FINGERPRINT", "VOICE"]
 
 
-def run(text, lex):
+def load_lexicon(lang=DEFAULT_LANG, path=None):
+    with open(path or LEXICONS[lang], encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def run(text, lex, lang="en"):
     results = {}
     results["BURSTINESS"] = check_burstiness(text)
-    results["SPECIFICITY"] = check_specificity(text)
-    results["SLOP DENSITY"] = check_slop(text, lex)
+    results["SPECIFICITY"] = check_specificity(text, lang)
+    results["SLOP DENSITY"] = check_slop(text, lex, lang)
     results["FINGERPRINT"] = check_fingerprint(text)
-    results["VOICE"] = check_voice(text, lex)
+    results["VOICE"] = check_voice_pt(text, lex) if lang == "pt" else check_voice(text, lex)
     scores = [results[c][0] for c in CHECKS]
     # The weakest check drags the verdict: a detector only needs one signal.
     overall = statistics.mean(scores) * 0.6 + min(scores) * 0.4
@@ -195,10 +260,12 @@ def main():
     ap.add_argument("input", nargs="?", default="-", help="file, or - for stdin")
     ap.add_argument("compare", nargs="?", help="second file, to show before/after")
     ap.add_argument("--json", action="store_true")
-    ap.add_argument("--lexicon", default=LEX)
+    ap.add_argument("--lang", choices=sorted(LEXICONS), default=DEFAULT_LANG,
+                    help="lexicon and voice checks to use (default: pt)")
+    ap.add_argument("--lexicon", default=None, help="override the lexicon path")
     args = ap.parse_args()
 
-    lex = json.load(open(args.lexicon, encoding="utf-8"))
+    lex = load_lexicon(args.lang, args.lexicon)
     read = lambda p: sys.stdin.read() if p == "-" else open(p, encoding="utf-8").read()
 
     targets = [(args.input, read(args.input))]
@@ -207,7 +274,7 @@ def main():
 
     payload = []
     for name, text in targets:
-        results, overall, verdict = run(text, lex)
+        results, overall, verdict = run(text, lex, args.lang)
         payload.append({
             "source": name,
             "checks": {k: {"score": round(v[0], 1), "detail": v[1]} for k, v in results.items()},
@@ -216,11 +283,11 @@ def main():
         })
 
     if args.json:
-        print(json.dumps(payload if args.compare else payload[0], indent=2))
+        print(json.dumps(payload if args.compare else payload[0], indent=2, ensure_ascii=False))
         return
 
     for (name, text), p in zip(targets, payload):
-        results, overall, verdict = run(text, lex)
+        results, overall, verdict = run(text, lex, args.lang)
         render(results, overall, verdict, label=os.path.basename(name) if args.compare else None)
     if args.compare:
         a, b = payload

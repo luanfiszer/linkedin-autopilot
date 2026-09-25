@@ -24,6 +24,13 @@ Usage
   pbpaste | python3 humanize.py - --report
   python3 humanize.py draft.txt --json
   python3 humanize.py draft.txt -o clean.txt
+  python3 humanize.py draft.txt --lang en     # English lexicon
+
+Language
+  --lang pt (the default in this repo) reads slop_pt.json. Its "words" and
+  "phrases" are replaced; its "flag_only" terms (jornada, ecossistema, ...)
+  are legitimate in some contexts, so they are only reported, like structures.
+  Passes 1 and 2 are identical in both languages.
 """
 
 import argparse
@@ -35,12 +42,17 @@ import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEX = os.path.join(HERE, "slop.json")
+LEXICONS = {"en": LEX, "pt": os.path.join(HERE, "slop_pt.json")}
+DEFAULT_LANG = "pt"
+DELETED = "\x01"   # marks where a phrase was deleted, so the next word can be capitalised
 
 URL_RE = re.compile(r"https?://\S+|www\.\S+|\S+@\S+\.\S+")
 SENT_RE = re.compile(r"[^.!?\n]+[.!?]*")
 
 
-def load_lexicon(path=LEX):
+def load_lexicon(path=LEX, lang=None):
+    if lang:
+        path = LEXICONS[lang]
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
 
@@ -140,16 +152,23 @@ def pass_lexical(text, lex):
             continue
         hits.append({"find": find, "replace": entry["replace"] or "(deleted)",
                      "count": len(found), "family": entry["family"]})
-        text = pattern.sub(lambda m: _match_case(m.group(0), entry["replace"]), text)
+        text = pattern.sub(lambda m: _match_case(m.group(0), entry["replace"]) or DELETED, text)
+    # A phrase deleted at the start of a sentence leaves it lowercase:
+    # "Vale ressaltar que o time cresceu" -> "O time cresceu".
+    text = re.sub(r"(^|[.!?][ \t]+|\n)" + DELETED + r"[ \t,]*(\w)",
+                  lambda m: m.group(1) + m.group(2).upper(), text)
+    text = text.replace(DELETED, "")
     # Clean up after deletions.
     text = re.sub(r"[ \t]{2,}", " ", text)
     text = re.sub(r"(?m)^[ \t]*([,.;:])\s*", "", text)
     text = re.sub(r"\s+([,.;:!?])", r"\1", text)
+    text = re.sub(r",(?:\s*,)+", ",", text)
+    text = re.sub(r",([.;:!?])", r"\1", text)
     text = re.sub(r"(?m)^[ \t]+$", "", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     # An em dash that became a comma, followed by a sentence connective, leaves
     # a splice ("is important, also, it's proof"). Promote it to a full stop.
-    text = re.sub(r",\s*(also|so|still|basically|in the end)\s*,\s*",
+    text = re.sub(r",\s*(also|so|still|basically|in the end|também|então|mesmo assim|no fim)\s*,\s*",
                   lambda m: ". " + m.group(1)[0].upper() + m.group(1)[1:] + ", ", text)
     return text, hits
 
@@ -164,6 +183,14 @@ def scan_structures(text, lex):
         found = pattern.findall(text)
         if found:
             flags.append({"name": s["name"], "count": len(found), "fix": s["fix"]})
+    # Terms that are fine in some contexts: flagged with a suggestion, never replaced.
+    for entry in lex.get("flag_only", []):
+        pattern = re.compile(r"\b" + re.escape(entry["find"]).replace(r"\ ", r"\s+") + r"\b",
+                             re.IGNORECASE)
+        found = pattern.findall(text)
+        if found:
+            flags.append({"name": f"Termo sinalizado: \"{entry['find']}\"", "count": len(found),
+                          "fix": f"Sugestão: {entry['replace']}. Troque só se não for o termo exato."})
     # Sentence-length uniformity is structural too.
     lens = [len(s.split()) for s in SENT_RE.findall(text) if len(s.split()) > 2]
     if len(lens) >= 4:
@@ -233,11 +260,13 @@ def main():
     ap.add_argument("-o", "--out", help="write cleaned text here instead of stdout")
     ap.add_argument("--report", action="store_true", help="print what changed, to stderr")
     ap.add_argument("--json", action="store_true", help="emit {text, report} as JSON")
-    ap.add_argument("--lexicon", default=LEX, help="path to slop.json")
+    ap.add_argument("--lang", choices=sorted(LEXICONS), default=DEFAULT_LANG,
+                    help="lexicon to use (default: pt)")
+    ap.add_argument("--lexicon", default=None, help="override the lexicon path")
     args = ap.parse_args()
 
     raw = sys.stdin.read() if args.input == "-" else open(args.input, encoding="utf-8").read()
-    lex = load_lexicon(args.lexicon)
+    lex = load_lexicon(args.lexicon) if args.lexicon else load_lexicon(lang=args.lang)
     clean, report = humanize(raw, lex)
 
     if args.json:

@@ -5,11 +5,12 @@ Rode localmente, nunca no Actions:
   python scripts/get_token.py               # imprime token e URN
   python scripts/get_token.py --gh-secrets  # grava direto nos secrets do GitHub
                                             # (via gh CLI) e só mostra o token mascarado
+  python scripts/get_token.py --save-env    # grava no .env local (fora do git)
 
 Precisa de LINKEDIN_CLIENT_ID e LINKEDIN_CLIENT_SECRET no .env, e do redirect
 URI http://localhost:8000/callback cadastrado no app do LinkedIn Developers.
 
-O token só é impresso no terminal. Este script não grava nada em disco.
+Sem flags, o token só é impresso no terminal. Nunca grava em arquivo versionado.
 """
 from __future__ import annotations
 
@@ -92,6 +93,23 @@ def set_gh_secret(name: str, value: str) -> None:
     print(f"  secret {name} atualizado no GitHub")
 
 
+def save_env(values: dict) -> None:
+    """Atualiza as chaves no .env (que está no .gitignore), mantendo o resto."""
+    path = ROOT / ".env"
+    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+    for key, value in values.items():
+        new = f"{key}={value}"
+        for i, line in enumerate(lines):
+            if line.startswith(f"{key}="):
+                lines[i] = new
+                break
+        else:
+            lines.append(new)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    path.chmod(0o600)
+    print(f"  .env atualizado ({', '.join(values)})")
+
+
 def mask(value: str) -> str:
     return value[:4] + "..." + value[-4:] if len(value) > 12 else "***"
 
@@ -101,6 +119,8 @@ def main():
     ap.add_argument("--gh-secrets", action="store_true",
                     help="grava LINKEDIN_ACCESS_TOKEN e LINKEDIN_PERSON_URN nos secrets do repo "
                          "via gh CLI, sem imprimir o token")
+    ap.add_argument("--save-env", action="store_true",
+                    help="grava o token e o URN no .env local (fora do git), sem imprimir")
     args = ap.parse_args()
     load_dotenv(ROOT / ".env")
     client_id = os.environ.get("LINKEDIN_CLIENT_ID", "").strip()
@@ -147,11 +167,14 @@ def main():
     print(f"Escopos:         {data.get('scope', SCOPES)}")
     print(f"Expira em:       {expires_at:%d/%m/%Y %H:%M} ({expires_in // 86400} dias)")
     print("=" * 64)
-    if args.gh_secrets:
+    if args.gh_secrets or args.save_env:
         print(f"\nLINKEDIN_PERSON_URN={urn}")
         print(f"LINKEDIN_ACCESS_TOKEN={mask(token)}  (não impresso)\n")
-        set_gh_secret("LINKEDIN_ACCESS_TOKEN", token)
-        set_gh_secret("LINKEDIN_PERSON_URN", urn)
+        if args.save_env:
+            save_env({"LINKEDIN_ACCESS_TOKEN": token, "LINKEDIN_PERSON_URN": urn})
+        if args.gh_secrets:
+            set_gh_secret("LINKEDIN_ACCESS_TOKEN", token)
+            set_gh_secret("LINKEDIN_PERSON_URN", urn)
         print(f"\nPronto. Renove o token antes de {expires_at:%d/%m/%Y}.")
         return
 

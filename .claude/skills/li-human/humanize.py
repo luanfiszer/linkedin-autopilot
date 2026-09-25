@@ -160,8 +160,9 @@ def pass_lexical(text, lex):
     text = text.replace(DELETED, "")
     # Clean up after deletions.
     text = re.sub(r"[ \t]{2,}", " ", text)
-    text = re.sub(r"(?m)^[ \t]*([,.;:])\s*", "", text)
-    text = re.sub(r"\s+([,.;:!?])", r"\1", text)
+    # Pontuação órfã só quando é pontuação mesmo: ".NET" e ".env" ficam.
+    text = re.sub(r"(?m)^[ \t]*([,.;:])(?=\s|$)\s*", "", text)
+    text = re.sub(r"[ \t]+([,.;:!?])(?=\s|$|[)\"'])", r"\1", text)
     text = re.sub(r",(?:\s*,)+", ",", text)
     text = re.sub(r",([.;:!?])", r"\1", text)
     text = re.sub(r"(?m)^[ \t]+$", "", text)

@@ -51,8 +51,13 @@ PROPER = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-Z][a-z]{2,}\b", re.MULTILINE)
 
 # Brazilian Portuguese. Letters include accents; numbers include R$.
 WORD_RE_PT = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*")
-NUMBERS_PT = re.compile(r"\b\d[\d.,]*%?|R\$\s?\d")
-PROPER_PT = re.compile(r"(?<![.!?]\s)(?<!^)\b[A-ZÀ-Ý][a-zà-ÿ]{2,}\b", re.MULTILINE)
+# Um algarismo solto ("2 operações") não é dado concreto, é só grafia: não conta.
+NUMBERS_PT = re.compile(r"\b\d{2,}[\d.,]*%?|\b\d[.,]\d+%?|\b\d%|R\$\s?\d")
+# Nomes próprios e termos técnicos: Redis, RabbitMQ, DateTimeOffset, SQL, C#, .NET.
+PROPER_PT = re.compile(r"(?<![.!?]\s)(?<!^)(?:"
+                       r"\b[A-ZÀ-Ý][A-Za-zà-ÿ0-9]*[A-Z0-9][A-Za-zà-ÿ0-9]*\b"  # CamelCase/sigla
+                       r"|\b[A-ZÀ-Ý][a-zà-ÿ]{2,}\b"                            # Nome
+                       r"|\.NET\b|\bC#|\bF#)", re.MULTILINE)
 # "nos" is left out on purpose: it is usually em + os, not a pronoun.
 PRONOUNS_PT = re.compile(r"\b(?:eu|me|mim|meu|minha|meus|minhas|comigo|nós|nosso|nossa|"
                          r"nossos|nossas|a gente|você|vocês|te|contigo)\b", re.IGNORECASE)

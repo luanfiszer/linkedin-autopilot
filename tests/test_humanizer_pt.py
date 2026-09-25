@@ -127,3 +127,21 @@ def test_cli_aceita_lang_pt(script):
     r = subprocess.run([sys.executable, str(path), str(FIX / "pt_bom.txt"), "--lang", "pt"],
                        capture_output=True, text=True)
     assert r.returncode == 0, r.stderr
+
+
+def test_algarismo_solto_nao_conta_como_dado_concreto():
+    assert detect.NUMBERS_PT.findall("são 2 operações e 1 evento") == []
+    assert len(detect.NUMBERS_PT.findall("caiu 97,5%, 15% e R$ 18 mil em 2026")) == 4
+
+
+def test_termos_tecnicos_contam_como_concretos():
+    achados = set(detect.PROPER_PT.findall(
+        "Usei RabbitMQ, PostgreSQL, SETNX, DateTimeOffset, C# e .NET no Redis."))
+    assert {"RabbitMQ", "PostgreSQL", "SETNX", "DateTimeOffset", "C#", ".NET", "Redis"} <= achados
+    assert detect.PROPER_PT.findall("Começo de frase não conta. Outra também não.") == []
+
+
+def test_nao_cola_ponto_de_nomes_tecnicos(lex):
+    texto = "Sou dev .NET e uso o arquivo .env.\n.NET no começo da linha também."
+    limpo, _ = humanize.humanize(texto, lex)
+    assert "dev .NET" in limpo and "arquivo .env." in limpo and "\n.NET no" in limpo

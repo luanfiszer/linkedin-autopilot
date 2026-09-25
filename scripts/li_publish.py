@@ -136,7 +136,29 @@ def _urn_from(resp) -> str:
     return urn
 
 
-def publish_rest(text, visibility, token, author, version):
+def upload_image(path: Path, token, author, version) -> str:
+    """Registra e envia a imagem. Devolve o urn:li:image. Se falhar, nenhum
+    post foi criado, então o erro é sempre definitivo."""
+    resp = _post(f"{API}/rest/images?action=initializeUpload", _headers(token, version),
+                 {"initializeUploadRequest": {"owner": author}})
+    if resp.status_code == 401:
+        raise TokenError(f"rest/images: 401 {resp.text[:300]}")
+    if resp.status_code != 200:
+        raise PublishError(f"rest/images: {resp.status_code} {resp.text[:300]}")
+    value = resp.json()["value"]
+    try:
+        up = requests.put(value["uploadUrl"], data=Path(path).read_bytes(),
+                          headers={"Authorization": f"Bearer {token}"}, timeout=120)
+    except requests.RequestException as exc:
+        raise PublishError(f"upload da imagem falhou: {exc}") from exc
+    if up.status_code == 401:
+        raise TokenError(f"upload da imagem: 401 {up.text[:300]}")
+    if up.status_code not in (200, 201):
+        raise PublishError(f"upload da imagem: {up.status_code} {up.text[:300]}")
+    return value["image"]
+
+
+def publish_rest(text, visibility, token, author, version, image=None):
     body = {
         "author": author,
         "commentary": escape_little_text(text),
@@ -149,6 +171,8 @@ def publish_rest(text, visibility, token, author, version):
         "lifecycleState": "PUBLISHED",
         "isReshareDisabledByAuthor": False,
     }
+    if image:
+        body["content"] = {"media": {"id": image["urn"], "altText": image["alt"]}}
     resp = _post(f"{API}/rest/posts", _headers(token, version), body)
     _check(resp, "rest/posts")
     return _urn_from(resp)
@@ -172,15 +196,16 @@ def publish_ugc(text, visibility, token, author):
     return _urn_from(resp)
 
 
-def publish(text, visibility, token, author, version):
+def publish(text, visibility, token, author, version, image=None):
     """Tenta rest/posts; se ele recusar o token self-serve (403, versão), tenta
-    v2/ugcPosts. Devolve (urn, endpoint usado)."""
+    v2/ugcPosts. Devolve (urn, endpoint usado). Post com imagem não tem
+    fallback: sair sem a foto seria publicar outra coisa."""
     try:
-        return publish_rest(text, visibility, token, author, version), "rest/posts"
+        return publish_rest(text, visibility, token, author, version, image), "rest/posts"
     except PublishError as exc:
         first = str(exc)
         code = re.search(r": (\d{3}) ", first)
-        if not code or code.group(1) not in {"403", "404", "426"}:
+        if image or not code or code.group(1) not in {"403", "404", "426"}:
             raise
         print(f"  rest/posts recusou ({first[:120]}). Tentando v2/ugcPosts.", file=sys.stderr)
     try:
@@ -298,6 +323,8 @@ def run(argv=None, *, now=None, approved_dir=None, published_dir=None, log_path=
     if args.dry_run:
         print("\n[dry-run] commentary que seria enviado para rest/posts:\n")
         print(escape_little_text(post.body))
+        if post.image_path:
+            print(f"\n[dry-run] imagem: {post.meta['image']}  alt: {post.meta.get('image_alt')!r}")
         print(f"\n[dry-run] {len(post.body)} caracteres. Nada foi enviado.")
         return EXIT_OK
 
@@ -314,7 +341,11 @@ def run(argv=None, *, now=None, approved_dir=None, published_dir=None, log_path=
 
     q.set_fields(post, publish_attempted_at=now.isoformat())
     try:
-        urn, endpoint = publish(post.body, post.meta["visibility"], token, author, version)
+        image = None
+        if post.image_path:
+            image = {"urn": upload_image(post.image_path, token, author, version),
+                     "alt": str(post.meta.get("image_alt", ""))}
+        urn, endpoint = publish(post.body, post.meta["visibility"], token, author, version, image)
     except TokenError as exc:
         q.set_fields(post, publish_attempted_at=None)
         print(f"ERRO: {TOKEN_MSG}\n  detalhe: {exc}", file=sys.stderr)
@@ -331,7 +362,7 @@ def run(argv=None, *, now=None, approved_dir=None, published_dir=None, log_path=
 
     posted_at = datetime.now(q.TZ).replace(microsecond=0).isoformat()
     q.set_fields(post, publish_attempted_at=None, posted_urn=urn, posted_at=posted_at,
-                 posted_via=endpoint)
+                 posted_via=endpoint, posted_image_urn=image["urn"] if image else None)
     dest = finalize(post, published_dir, log_path)
     print(f"PUBLICADO via {endpoint}: {urn}\n  https://www.linkedin.com/feed/update/{urn}/\n"
           f"  arquivo: {dest}")

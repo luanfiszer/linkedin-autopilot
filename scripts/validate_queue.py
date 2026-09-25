@@ -9,11 +9,13 @@ Checa, para cada arquivo:
   - nenhum placeholder {{...}} sobrando
   - detect.py --lang pt com nota >= 70
   - no máximo 1 post por dia (contando approved/ e published/, no fuso de SP)
+  - nenhum termo de linkedin/blocklist.txt (compliance da empresa atual)
 
 Uso
   python scripts/validate_queue.py                        # todos os pendentes em approved/
   python scripts/validate_queue.py --base origin/main     # só os novos/alterados vs. a base
   python scripts/validate_queue.py queue/approved/X.md    # arquivos específicos
+  python scripts/validate_queue.py --check-text linkedin/ideias.md   # só a blocklist
 """
 from __future__ import annotations
 
@@ -34,6 +36,19 @@ import queue_lib as q  # noqa: E402
 MIN_CHARS, MAX_CHARS = 400, 3000
 MIN_SCORE = 70
 PLACEHOLDER_RE = re.compile(r"\{\{.*?\}\}", re.DOTALL)
+BLOCKLIST = q.ROOT / "linkedin" / "blocklist.txt"
+
+
+def load_blocklist(path: Path = BLOCKLIST) -> list[str]:
+    if not Path(path).exists():
+        return []
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    return [ln.strip() for ln in lines if ln.strip() and not ln.lstrip().startswith("#")]
+
+
+def blocked_terms(text: str, terms: list[str]) -> list[str]:
+    low = text.casefold()
+    return [t for t in terms if t.casefold() in low]
 
 
 def changed_files(base: str) -> list[Path]:
@@ -43,7 +58,7 @@ def changed_files(base: str) -> list[Path]:
     return [q.ROOT / line for line in out.splitlines() if line.endswith(".md")]
 
 
-def validate_post(post: q.Post, now: datetime, lex) -> list[str]:
+def validate_post(post: q.Post, now: datetime, lex, blocklist=None) -> list[str]:
     errs = []
     if not q.FILENAME_RE.match(post.path.name):
         errs.append("nome fora do padrão AAAA-MM-DD-HHMM-slug.md (slug em minúsculas, sem acento)")
@@ -61,6 +76,10 @@ def validate_post(post: q.Post, now: datetime, lex) -> list[str]:
     placeholders = PLACEHOLDER_RE.findall(post.body + "\n" + post.raw_front)
     if placeholders:
         errs.append("placeholder sem preencher: " + ", ".join(sorted(set(placeholders))))
+    hits = blocked_terms(post.body + "\n" + str(post.meta.get("hook", "")),
+                         load_blocklist() if blocklist is None else blocklist)
+    if hits:
+        errs.append("termo proibido pela blocklist (compliance): " + ", ".join(hits))
     _, score, verdict = detect.run(post.body, lex, "pt")
     if score < MIN_SCORE:
         errs.append(f"detect.py --lang pt deu {score:.1f} ({verdict}); mínimo {MIN_SCORE}")
@@ -102,7 +121,17 @@ def run(argv=None, *, now=None, approved_dir=None, published_dir=None) -> int:
     ap = argparse.ArgumentParser(description="Valida os posts de queue/approved/.")
     ap.add_argument("files", nargs="*", help="arquivos a validar (padrão: todos os pendentes)")
     ap.add_argument("--base", help="valida só o que mudou em relação a este ref git")
+    ap.add_argument("--check-text", metavar="ARQUIVO",
+                    help="só confere a blocklist num texto qualquer (ex.: linkedin/ideias.md)")
     args = ap.parse_args(argv)
+
+    if args.check_text:
+        hits = blocked_terms(Path(args.check_text).read_text(encoding="utf-8"), load_blocklist())
+        if hits:
+            print(f"FALHOU  {args.check_text}: termo proibido pela blocklist: {', '.join(hits)}")
+            return 1
+        print(f"OK      {args.check_text}: nenhum termo da blocklist")
+        return 0
 
     approved_dir = Path(approved_dir or q.APPROVED)
     published_dir = Path(published_dir or q.PUBLISHED)

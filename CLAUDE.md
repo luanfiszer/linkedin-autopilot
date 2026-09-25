@@ -49,8 +49,11 @@ começa em 2026-10-05). Assim o usuário tem uma semana para revisar.
 
 - `linkedin/voice.md`: voz, público, posições, provas que podem ser usadas, o
   que é proibido. Campos marcados `[NÃO INFORMADO]` não existem: não preencha.
-- `linkedin/ideias.md`: fatos e ideias que o usuário anotou durante a semana.
-  É a principal fonte de posts novos.
+- `linkedin/ideias.md`: fatos e ideias que o usuário anotou durante a semana e
+  o **diário técnico** gerado pela coleta semanal (seção abaixo). É a
+  principal fonte de posts novos. Posts sobre o trabalho atual seguem as
+  regras de "Fora dos limites" do `voice.md`: tecnologia e experiência, nunca
+  a empresa, seus sistemas ou números.
 - `linkedin/log.md` e os arquivos de `queue/published/`: o que já saiu. Não
   repita tema, gancho ou história das últimas duas semanas.
 - `queue/approved/`: o que já está agendado. Não marque 2 posts no mesmo dia.
@@ -145,6 +148,55 @@ suficientes, escreva mesmo assim os posts de OPINION e TEACH (que dependem de
 posições, não de números) e deixe os de PROOF/STORY com `{{...}}` bem
 explicados. Nunca preencha o buraco com ficção.
 
+## Coleta semanal (roda no Mac do Luan)
+
+Quando receber **"rodar coleta semanal"**. Esta tarefa só funciona na máquina
+local, porque o código da empresa existe só lá. Ela transforma os commits da
+semana em notas **sanitizadas** para `linkedin/ideias.md`. Nenhum código sai
+do Mac.
+
+**Regras de compliance (inegociáveis):**
+
+- Repositórios de trabalho (`~/Documents/MEDGRUPO/*`) são **somente leitura**:
+  só `git log`, `git show` e `git diff`. Nada de checkout, pull, fetch, commit
+  ou qualquer outra alteração neles.
+- Nada de código, trecho adaptado, nome de repositório, serviço, classe,
+  método, tabela, fila, endpoint, variável ou arquivo da empresa nas notas.
+- Nada de números internos, dados de alunos/clientes/colegas, nem detalhes de
+  como uma proteção de segurança funciona por dentro.
+- Cada nota descreve só: **a técnica ou padrão**, o **tipo de problema** e **o
+  que o Luan aprendeu ou decidiu**. Teste: alguém de fora conseguiria
+  descobrir qual sistema, qual regra ou qual número? Se sim, reescreva mais
+  genérico ou descarte.
+- Repositórios pessoais (`~/Documents/ProjetosPessoais/*`, exceto este) podem
+  ser citados pelo nome, com link se forem públicos.
+
+**Passos:**
+
+1. Para cada repositório em `~/Documents/MEDGRUPO/` e
+   `~/Documents/ProjetosPessoais/`, pegue o e-mail do autor com
+   `git -C <repo> config user.email` e liste os commits dele dos últimos 8
+   dias, em todas as branches:
+   `git -C <repo> log --all --since="8 days ago" --author="<email>" --stat`.
+2. Leia as mensagens e, quando precisar entender a técnica, os diffs
+   (`git -C <repo> show <sha>`). Isso fica só na sessão; nada é copiado.
+3. Escolha de 3 a 8 coisas que renderiam post: um padrão aplicado, um bug e a
+   causa, uma decisão de arquitetura, um trade-off, algo que deu errado.
+   Ignore commits triviais (merge, bump, formatação).
+4. Acrescente ao fim de `linkedin/ideias.md` uma seção
+   `## Diário técnico (coleta de AAAA-MM-DD)` com um item por ideia, marcado
+   `[trabalho]` ou `[pessoal]`, no formato:
+   `- [trabalho] Outbox Pattern num consumer RabbitMQ: evento se perdia quando o
+   banco confirmava e a publicação falhava. Aprendi a ...`
+5. Confira a blocklist e releia cada item com o teste acima:
+   `python3 scripts/validate_queue.py --check-text linkedin/ideias.md`.
+   Se aparecer um termo novo da empresa que deveria estar bloqueado, acrescente
+   em `linkedin/blocklist.txt`.
+6. Commite só `linkedin/ideias.md` (e a blocklist, se mudou) na `main` deste
+   repositório com `notas: diário técnico AAAA-MM-DD` e dê push. Notas não
+   são posts: nada é publicado sem passar pelo PR da rotina semanal.
+7. Se não houver commits na semana, não escreva nada e diga isso.
+
 ## Mapa do repositório
 
 | caminho | o que é |
@@ -152,7 +204,8 @@ explicados. Nunca preencha o buraco com ficção.
 | `.claude/skills/li-*` | skills do plugin linkedin-agent (MIT, Jake Schincariol), com caminhos adaptados para o repo |
 | `.claude/skills/li-human/slop_pt.json` | léxico PT-BR do humanizador |
 | `linkedin/voice.md` | perfil de voz |
-| `linkedin/ideias.md` | caixa de entrada de fatos e ideias da semana |
+| `linkedin/ideias.md` | fatos e ideias da semana + diário técnico da coleta |
+| `linkedin/blocklist.txt` | termos da empresa que nunca podem aparecer num post |
 | `linkedin/plan.md` | plano da semana atual |
 | `linkedin/log.md` | log de publicações (escrito pelo publicador) |
 | `queue/approved/` | posts aprovados (chegam por merge) |

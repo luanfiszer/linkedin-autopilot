@@ -1,0 +1,12 @@
+# Termos que nunca podem aparecer num post (compliance da empresa atual).
+# Um por linha. A comparação ignora maiúsculas/minúsculas e acha o termo dentro
+# de palavras maiores (MEDSoft pega MEDSoft.Service.Aulas). Linhas com # são
+# comentários. Acrescente aqui nomes de sistemas, clientes, filas, tabelas...
+MEDGRUPO
+MED GRUPO
+MEDSoft
+medgrupo-sdk
+MEDPlanner
+RealizaProva
+CronogramaAcademico
+AutorizacaoConteudos

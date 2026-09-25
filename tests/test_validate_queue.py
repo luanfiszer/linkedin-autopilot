@@ -104,3 +104,18 @@ def test_posted_urn_em_arquivo_novo_e_erro(dirs):
 def test_fila_vazia_passa(dirs):
     a, p = dirs
     assert validate_queue.run([], now=NOW, approved_dir=a, published_dir=p) == 0
+
+
+def test_blocklist_barra_nome_da_empresa_e_sistemas(dirs, capsys):
+    body = BOM.replace("da Estúdio Norte", "do MedGrupo").replace(
+        "Resultado até agora", "No MEDSoft.Service.Aulas o resultado até agora")
+    path = write_post(dirs[0], NOW + timedelta(days=2), body=body)
+    assert validate(dirs, path) == 1
+    out = capsys.readouterr().out
+    assert "blocklist" in out and "MEDGRUPO" in out and "MEDSoft" in out
+
+
+def test_blocklist_real_tem_os_termos_da_empresa():
+    termos = [t.casefold() for t in validate_queue.load_blocklist()]
+    assert "medgrupo" in termos and "medsoft" in termos
+    assert validate_queue.blocked_terms("falei de conteúdos e aulas", validate_queue.load_blocklist()) == []

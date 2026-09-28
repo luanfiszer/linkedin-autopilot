@@ -1,0 +1,12 @@
+titulo: Round-trip sem preservar o desconhecido
+caixas:
+  - Dois processos gravam o mesmo JSON
+  - Um le o JSON pra uma classe tipada
+  - Regrava so os campos que a classe conhece
+  - Campo do outro processo some, sem erro
+setas:
+  - cada um grava um campo
+  - so os campos declarados
+  - round-trip
+destaque: 3
+nota: "JsonExtensionData preserva o que a classe nao conhece."

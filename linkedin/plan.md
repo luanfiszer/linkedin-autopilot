@@ -1,64 +1,69 @@
-# Plano da semana de 28/09 a 04/10/2026
+# Plano da semana de 05/10 a 11/10/2026
 
-Gerado pela rotina semanal (skill `/li-plan`) em 25/09/2026. Semana-alvo:
-segunda 28/09 a domingo 04/10 (a próxima semana completa a partir de hoje).
+Gerado pela rotina semanal (skill `/li-plan`) em 28/09/2026. Semana-alvo:
+segunda 05/10 a domingo 11/10 (a próxima semana completa a partir de hoje,
+28/09, que também é segunda-feira).
 
 Fontes usadas: `linkedin/voice.md` (posições e provas públicas) e o diário
 técnico de `linkedin/ideias.md` (coleta de 25/09/2026). A seção "Esta semana"
-de `ideias.md` estava vazia.
+de `ideias.md` estava vazia. `queue/approved/` (semana de 28/09) foi revisado
+para não repetir tema, gancho ou história.
 
 ```
-SEMANA DE 28/09
+SEMANA DE 05/10
 
 SEG  -
-TER  08:15  PROOF    #12 The Comparison     - o sistema de tickets da PROVER vs a ferramenta paga que ele substituiu
-QUA  08:00  OPINION  #1  Contrarian Take    - Outbox não é exagero: publicar evento logo após salvar no banco é bug esperando acontecer
-QUI  07:45  TEACH    #11 Myth Bust          - Redis não resolve idempotência sozinho: banco como fonte da verdade, fila/cache como aceleradores
-SEX  08:30  STORY    #9  Story Cold Open    - o registro "mais recente" que na verdade era o mais antigo (bug de fuso com DateTimeOffset)
+TER  08:15  PROOF     #10 The Receipt        - refatoração de queries N+1 na PROVER: latência caiu 15%
+QUA  08:00  OPINION   #15 The Warning        - confiar na memória do agente de IA custa caro; decisão tem que virar ADR
+QUI  07:45  TEACH     #21 Direct Value       - JsonExtensionData: como não perder campo em JSON reescrito por dois processos
+SEX  08:30  STORY     #20 The Walk-Away      - a otimização de cache que aprovei e derrubei no mesmo dia
 SAB  -
 DOM  -
 ```
 
 ## Detalhe de cada slot
 
-1. **TER 29/09, 08:15 — PROOF — #12 The Comparison**
-   Ângulo: o sistema de gestão de tickets que fiz do zero na PROVER (C#,
-   ASP.NET MVC) substituiu uma ferramenta paga. Custo operacional caiu 97,5%,
-   sobrou só infraestrutura. Fato público de `voice.md` (seção "Provas que
-   posso usar"), não é da MEDGRUPO. Nenhum `{{...}}` necessário.
+1. **TER 06/10, 08:15 — PROOF — #10 The Receipt**
+   Ângulo: na PROVER, refatorei consultas críticas no SQL Server (EF Core e
+   LINQ), eliminei N+1 e a latência das requisições caiu 15%. Fato público de
+   `voice.md` (seção "Provas que posso usar"), não é da MEDGRUPO, diferente do
+   PROOF da semana passada (sistema de tickets). Nenhum `{{...}}` necessário.
 
-2. **QUA 30/09, 08:00 — OPINION — #1 Contrarian Take**
-   Ângulo: publicar evento logo depois de salvar no banco é bug esperando
-   acontecer; Outbox Pattern não é over-engineering. Base: posição #2 de
-   `voice.md`, apoiada no formato já autorizado ali ("implementei Outbox
-   Pattern num consumer RabbitMQ; evento perdia quando o banco confirmava e a
-   publicação falhava"). Sem nome de empresa, sem número interno.
+2. **QUA 07/10, 08:00 — OPINION — #15 The Warning**
+   Ângulo: posição #1 de `voice.md` — programar com agente de IA exige mais
+   disciplina, não menos, porque o agente não lembra o que foi combinado na
+   sessão anterior. Decisão tem que estar escrita (ADR), regra de arquitetura
+   tem que quebrar o build, comportamento tem que ter teste. Base: projeto
+   pessoal construído sessão a sessão com agente, com dezenas de ADRs e um
+   registro de aprendizados (sem citar o nome do projeto). Diferente da
+   posição de Outbox usada semana passada. Nenhum `{{...}}` necessário.
 
-3. **QUI 01/10, 07:45 — TEACH — #11 Myth Bust**
-   Ângulo: uma das "outras ideias" listadas em `voice.md` — idempotência numa
-   coluna do Postgres em vez de Redis `SETNX`, motivada por uma janela de
-   crash entre criar o registro e enfileirar. Fonte: história do projeto
-   pessoal (app de treino de inglês, sem citar o nome), que `voice.md`
-   autoriza usar com números e detalhes. Trocado no lugar do item do diário
-   técnico sobre `JsonExtensionData` porque este último não tinha material
-   concreto suficiente (números/nomes públicos) para passar no `detect.py`
-   sem enfraquecer o texto.
+3. **QUI 08/10, 07:45 — TEACH — #21 Direct Value**
+   Ângulo: item do diário técnico — desserialização tipada apaga dados em
+   silêncio. Com dois processos escrevendo o mesmo JSON, ler para uma classe
+   e regravar descarta toda chave que a classe não declara. Resolvido com
+   `JsonExtensionData` do .NET nos níveis que são regravados. Lição: todo
+   read-modify-write de documento compartilhado precisa preservar o que não
+   conhece. Já sanitizado no diário técnico (sem nome de sistema, tabela ou
+   número interno). Diferente do TEACH de idempotência usado semana passada.
 
-4. **SEX 02/10, 08:30 — STORY — #9 Story Cold Open**
-   Ângulo: item do diário técnico — bug de fuso com o modo legado de
-   timestamps do driver do PostgreSQL: um `DateTime` voltava no fuso do
-   processo, uma consolidação mais antiga parecia mais nova e sobrescrevia a
-   certa. Só apareceu num ambiente real, nunca nos testes locais. Correção:
-   trocar para `DateTimeOffset` e teste de regressão com data em -03:00.
-   Sanitizado, sem nome de sistema ou número interno.
+4. **SEX 09/10, 08:30 — STORY — #20 The Walk-Away**
+   Ângulo: posição #3 de `voice.md` — otimização sem medição é chute. No
+   projeto pessoal, aprovei uma otimização de prompt caching e derrubei no
+   mesmo dia: a medição mostrou que o prefixo mínimo pra cache engatar era
+   4.096 tokens, não os 1.024 que eu tinha assumido, e uma conversa real nunca
+   chegava lá. Números já autorizados em `voice.md` (sem citar o nome do
+   projeto). Diferente da história de bug de fuso usada semana passada.
 
 Mix respeitado: PROOF, OPINION, TEACH e STORY, um por dia, nunca dois do
-mesmo tipo seguidos, máximo 1 post por dia, todos em horário de pico
-(terça a quinta) exceto o quarto, que foi para sexta de manhã (segunda opção
-da skill) para fechar com STORY sem cair no fim de semana.
+mesmo tipo seguidos, máximo 1 post por dia, três em horário de pico (terça a
+quinta) e o quarto na sexta de manhã (segunda opção da skill), igual ao
+padrão da semana anterior. Nenhum gancho repete o da semana de 28/09
+(#12, #1, #11, #9 não reaparecem aqui).
 
-Sem repetição de tema: não há posts publicados de verdade ainda (só um post
-de teste em `queue/published/`), e `queue/approved/` está vazio.
+Sem repetição de tema: nenhum dos quatro ângulos acima repete tema, gancho ou
+história dos posts já aprovados/publicados (`queue/approved/` da semana de
+28/09 e `queue/published/`).
 
 Não há lista de engajamento nesta rotina (fora do escopo do CLAUDE.md deste
 repositório — a rotina semanal só cobre posts).

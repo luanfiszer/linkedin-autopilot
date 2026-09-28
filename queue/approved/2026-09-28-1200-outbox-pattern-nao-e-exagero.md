@@ -1,5 +1,5 @@
 ---
-scheduled_at: 2026-09-30T08:00:00-03:00
+scheduled_at: 2026-09-28T12:00:00-03:00
 visibility: PUBLIC
 type: OPINION
 hook: "#1 Contrarian Take"

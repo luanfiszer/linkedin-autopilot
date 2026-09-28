@@ -6,6 +6,10 @@ hook: "#1 Contrarian Take"
 human_score: 75.0
 image: "media/fotos/gerado-outbox-fluxo.png"
 image_alt: "Diagrama: dados e evento gravados na mesma transação numa tabela outbox; um worker lê e publica no RabbitMQ"
+posted_urn: "urn:li:share:7510353601551237120"
+posted_at: "2026-09-28T12:03:54-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQGoxTb6G36mbg"
 ---
 Salvar no banco e publicar o evento logo em seguida parece inofensivo. Não é.
 

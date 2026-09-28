@@ -1,5 +1,5 @@
 ---
-scheduled_at: 2026-09-29T08:15:00-03:00
+scheduled_at: 2026-09-28T12:00:00-03:00
 visibility: PUBLIC
 type: PROOF
 hook: "#12 The Comparison"

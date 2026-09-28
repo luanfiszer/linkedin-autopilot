@@ -1,0 +1,5 @@
+titulo: Outbox Pattern
+caixas: [Dados + evento no mesmo SaveChangesAsync(), Tabela outbox, Worker em background, RabbitMQ]
+setas: [mesma transação, lê pendentes, publica]
+destaque: 1
+nota: Se a publicação falhar, o evento continua na tabela esperando a próxima tentativa.

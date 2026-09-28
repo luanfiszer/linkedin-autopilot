@@ -1,5 +1,5 @@
 ---
-scheduled_at: 2026-10-01T07:45:00-03:00
+scheduled_at: 2026-10-03T07:45:00-03:00
 visibility: PUBLIC
 type: TEACH
 hook: "#11 Myth Bust"

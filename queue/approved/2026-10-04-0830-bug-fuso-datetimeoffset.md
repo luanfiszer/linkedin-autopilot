@@ -1,5 +1,5 @@
 ---
-scheduled_at: 2026-10-02T08:30:00-03:00
+scheduled_at: 2026-10-04T08:30:00-03:00
 visibility: PUBLIC
 type: STORY
 hook: "#9 Story Cold Open"

@@ -6,6 +6,10 @@ hook: "#10 The Receipt"
 human_score: 86.9
 image: "media/fotos/gerado-n1-vs-include.png"
 image_alt: "Cartão de código: consulta N+1 em LINQ vs a versão que traz tudo com Include"
+posted_urn: "urn:li:share:7510683161329332224"
+posted_at: "2026-09-29T09:53:27-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQENP0eDKFjvkg"
 ---
 15% de latência a menos. Veio de um N+1 escondido dentro de um LINQ.
 

@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-"""Gera imagens-ilustração para os posts: cartão de código e diagrama simples.
+"""Gera imagens para os posts: cartão de código, diagrama simples e ilustração em SVG.
 
-As imagens têm cara de ilustração técnica, não de foto nem de print real.
-Nunca use isto para simular um print (terminal, tela, resultado de teste):
-print falso é enganoso. Print de verdade, só o Luan manda.
+Tudo aqui tem cara de ilustração, não de foto nem de print real. A ilustração
+é um SVG desenhado à mão pelo Claude (formas chapadas, metáfora com objetos,
+sem pessoas) e convertido para PNG. Nunca use nada disto para simular um
+print (terminal, tela, resultado de teste): print falso é enganoso. Print de
+verdade, só o Luan manda.
 
 Uso
   python scripts/gerar_imagem.py codigo exemplo.cs --lang csharp \\
       --titulo "OutboxWorker.cs" -o media/fotos/gerado-outbox-codigo.png
   python scripts/gerar_imagem.py diagrama fluxo.yml -o media/fotos/gerado-outbox-fluxo.png
+  python scripts/gerar_imagem.py svg fila.svg -o media/fotos/gerado-fila-esteira.png
+
+A ilustração SVG deve ter viewBox 0 0 1600 900 e usar font-family="sans-serif".
+O SVG é copiado para media/fotos/fontes/gerado-<nome>.svg (a fonte exigida pela
+validação). Referências externas (<image href="http...">) são recusadas.
 
 Formato do diagrama (YAML):
   titulo: Outbox Pattern
@@ -17,12 +24,14 @@ Formato do diagrama (YAML):
   destaque: 1          # opcional: índice da caixa em destaque (0 = primeira)
   nota: O evento só sai da tabela depois de publicado.   # opcional
 
-Dependências: pillow, pygments (requirements-images.txt). Fontes: usa DejaVu
+Dependências: pillow, pygments, resvg-py (requirements-images.txt). Fontes: usa DejaVu
 (Linux), Menlo/SF (macOS) ou as que vêm com o matplotlib, se instalado.
 """
 from __future__ import annotations
 
 import argparse
+import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -220,10 +229,35 @@ def render_diagram(spec: dict, out: Path) -> Path:
     return _save(img, out)
 
 
-def _save(img: Image.Image, out: Path) -> Path:
+SVG_W, SVG_H = 1600, 900
+EXTERNAL_REF = re.compile(r"""(?:href|src)\s*=\s*["'](?:https?:|//|file:)""", re.I)
+
+
+def render_svg(svg: str, out: Path) -> Path:
+    """Converte a ilustração SVG em PNG 1600x900 e guarda o SVG como fonte."""
+    import resvg_py
+    if EXTERNAL_REF.search(svg):
+        sys.exit("SVG com referência externa (imagem da internet ou arquivo): desenhe tudo no próprio SVG.")
+    sans = next((c for c in SANS_CANDIDATES if Path(c).exists()), None)
+    family = "DejaVu Sans" if sans and "dejavu" in sans.lower() else "Helvetica Neue"
+    png = resvg_py.svg_to_bytes(svg_string=svg, width=SVG_W, height=SVG_H,
+                                sans_serif_family=family, font_family=family)
+    out = _prefixed(out, "gerado-")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(bytes(png))
+    fonte = out.parent / "fontes" / (out.stem + ".svg")
+    fonte.parent.mkdir(parents=True, exist_ok=True)
+    fonte.write_text(svg, encoding="utf-8")
+    return out
+
+
+def _prefixed(out, prefix: str) -> Path:
     out = Path(out)
-    if not out.name.startswith("gerado-"):
-        out = out.with_name("gerado-" + out.name)
+    return out if out.name.startswith(prefix) else out.with_name(prefix + out.name)
+
+
+def _save(img: Image.Image, out: Path) -> Path:
+    out = _prefixed(out, "gerado-")
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out, "PNG", optimize=True)  # PNG do Pillow não leva EXIF
     return out
@@ -240,11 +274,16 @@ def main():
     g = sub.add_parser("diagrama", help="diagrama de 2 a 5 caixas a partir de um YAML")
     g.add_argument("arquivo", help="arquivo YAML, ou - para stdin")
     g.add_argument("-o", "--out", required=True)
+    i = sub.add_parser("svg", help="ilustração desenhada em SVG (metáfora com objetos, sem pessoas)")
+    i.add_argument("arquivo", help="arquivo .svg, ou - para stdin")
+    i.add_argument("-o", "--out", required=True)
     args = ap.parse_args()
 
     src = sys.stdin.read() if args.arquivo == "-" else Path(args.arquivo).read_text(encoding="utf-8")
     if args.modo == "codigo":
         path = render_code(src, args.lang, args.titulo, args.out)
+    elif args.modo == "svg":
+        path = render_svg(src, args.out)
     else:
         path = render_diagram(yaml.safe_load(src) or {}, args.out)
     w, h = Image.open(path).size

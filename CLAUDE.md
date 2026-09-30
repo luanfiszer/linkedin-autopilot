@@ -76,42 +76,77 @@ voz do usuário**. Os ganchos de `.claude/skills/li-post/hooks.json` estão em
 inglês: use a estrutura, escreva em português natural. Entre 400 e 3.000
 caracteres. Sem markdown (o LinkedIn não renderiza `**negrito**`).
 
-### 3.1 Imagem: precisa? Se sim, qual?
+### 3.1 Imagem: todo post tem uma
 
-Nem todo post precisa de imagem. **No máximo 2 posts por semana com imagem.**
-Decida post a post, nesta ordem:
+**Todo post sai com imagem.** A validação do PR falha em post sem `image`.
+A imagem preferida é **real, do Luan** (foto ou print); a gerada é só a
+reserva. Para cada post:
 
-1. **Precisa?** Só se a imagem explicar algo que o texto sozinho explica mal:
-   um fluxo (diagrama), um antes/depois de código, um print que prova o que
-   o post conta. Opinião e história costumam ir sem imagem.
-2. **Já existe?** Veja `media/fotos/` (e `CATALOGO.md`), descarte as já usadas
-   (`grep -r "image:" queue/`) e abra as candidatas com a ferramenta Read.
-3. **Dá pra gerar?** Use `scripts/gerar_imagem.py` (instale
-   `requirements-images.txt`):
+1. **Já existe foto real que sirva?** Veja `media/fotos/` (e `CATALOGO.md`),
+   descarte as já usadas (`grep -r "image:" queue/`) e abra as candidatas com
+   a ferramenta Read. Se servir, use e pule o resto.
+2. **Senão, peça uma ao Luan** em `image_request` (ver item 5) **e** gere a
+   reserva em `image`, pelos itens 3 ou 4.
+3. **Reserva: diagrama ou código (preferido).** Use `scripts/gerar_imagem.py`:
    - `diagrama`: fluxo de 2 a 5 caixas a partir de um YAML;
    - `codigo`: cartão com até 30 linhas de código **genérico, escrito do zero**
      pra ilustrar o conceito (nunca código da empresa, nem adaptado).
-   Salve a saída como `media/fotos/gerado-<slug>.png` e a fonte (o YAML ou o
-   código) em `media/fotos/fontes/gerado-<slug>.<ext>`: a validação exige a
-   fonte e passa a blocklist nela. Abra a imagem gerada com Read e confira se
-   ficou legível antes de usar.
-4. **Senão, peça ao Luan.** Quando o ideal é um print ou foto real (tela do
-   projeto pessoal, teste passando, o app no celular, o setup), não gere nada:
-   escreva no frontmatter `image_request:` com o que ele deve mandar, e liste
-   no PR. O post pode sair sem a imagem se ele não mandar.
+   Serve pra quase todo TEACH e PROOF técnico, e pra OPINION que tenha um
+   "jeito errado x jeito certo". Salve a saída como
+   `media/fotos/gerado-<slug>.png` e a fonte (o YAML ou o código) em
+   `media/fotos/fontes/gerado-<slug>.<ext>`.
+4. **Reserva: ilustração em SVG (quando diagrama/código não faz sentido).** Típico de
+   STORY, OFFER e OPINION sem conteúdo técnico. Você mesmo desenha um SVG
+   (`viewBox="0 0 1600 900"`, `font-family="sans-serif"`) num arquivo
+   temporário e roda
+   `python3 scripts/gerar_imagem.py svg /tmp/cena.svg -o media/fotos/gerado-<slug>.png`.
+   O script converte para PNG e guarda o SVG como fonte. A cena:
+   - é uma **metáfora visual com objetos** do tema do post (ex.: fila: caixas
+     numa esteira; fuso: dois relógios, UTC e -03:00, no mesmo instante;
+     memória x documento: nuvem de pensamento se desfazendo e fichas num
+     arquivo);
+   - estilo editorial chapado: fundo claro (`#F3EEE4`), 3 ou 4 cores sóbrias
+     (`#2F4A4F`, `#3E7C78`, `#C99A63`, `#C0563B` pra destaque), formas
+     simples, sem gradiente, brilho ou sombra;
+   - texto só se ajudar (um rótulo curto, uma legenda), sempre com acento
+     certo, e todo número tem que estar no post;
+   - nunca tem pessoas, rostos ou mãos, nem imagem externa (`<image href>`
+     é recusado);
+   - nunca finge ser foto do Luan nem prova de algo que o post conta.
+   Abra o PNG com Read. Se estiver confuso, feio ou com texto cortado,
+   simplifique e gere de novo.
+5. **O pedido (`image_request`).** Uma frase dizendo o que ele deve mandar,
+   pensada pra ser fácil de fazer em poucos minutos: print do projeto
+   pessoal (ADR, teste passando, app no celular), foto de um rascunho à mão
+   no caderno ou quadro, print de algo do celular que ilustre o tema (ex.:
+   relógio mundial pra um post de fuso), o setup. Diga o que esconder (nome
+   do projeto, caminhos, notificações). Em post sobre o trabalho, peça só
+   coisa sem nada da empresa (rascunho à mão, setup, algo do celular dele),
+   nunca print de tela do trabalho.
+   Se ele mandar, a foto dele substitui a reserva; se não, o post sai com a
+   reserva. Nunca deixe só o `image_request`.
+
+Varie: não repita a mesma metáfora de uma semana pra outra.
+
+Abra toda imagem gerada com Read e confira se ficou legível antes de usar. A
+validação exige a fonte (`media/fotos/fontes/<nome>.<ext>`) de toda imagem
+`gerado-*` e passa a blocklist nela.
 
 **Nunca:**
-- imagem com cara de gerada por IA (pessoas, cenas, ilustração "artística");
-- print falso: terminal, tela ou resultado de teste inventado é enganoso;
+- imagem com cara de gerada por IA: pessoas, rostos, mãos, cenas
+  fantasiosas, brilho/neon, render 3D;
+- print falso: terminal, tela ou resultado de teste inventado é enganoso
+  (nem por diagrama, nem por SVG);
 - imagem baixada da internet (direito autoral);
 - foto ou print em que dê pra ler código, sistema, conversa (Slack/Teams/
   e-mail), crachá, ferramenta interna, rosto de outra pessoa ou endereço.
 
-No frontmatter, com imagem: `image: "media/fotos/<arquivo>"` e `image_alt:`
-com uma descrição objetiva do que aparece (até 120 caracteres, pra leitor de
-tela; ex.: "Diagrama: dados e evento gravados juntos, worker publica no
-RabbitMQ"). Pedido: `image_request: "Print do app do projeto pessoal na tela
-de correção"`.
+No frontmatter: `image: "media/fotos/<arquivo>"` e `image_alt:` com uma
+descrição objetiva do que aparece (até 120 caracteres, pra leitor de tela;
+ex.: "Diagrama: dados e evento gravados juntos, worker publica no RabbitMQ";
+"Ilustração: caixas de papelão enfileiradas numa esteira"). Pedido, junto
+com a reserva: `image_request: "Print do app do projeto pessoal na tela de
+correção"`.
 
 ### 4. Humanizar e pontuar
 
@@ -149,7 +184,7 @@ checagem mais fraca, e rode de novo. A nota final vai no `human_score`.
 
 Um arquivo por post: `queue/approved/AAAA-MM-DD-HHMM-slug.md` (data e hora
 locais de SP, slug em minúsculas, sem acento, com hífens). `image` e
-`image_alt` são opcionais (ver 3.1):
+`image_alt` são obrigatórios; `image_request` é opcional (ver 3.1):
 
 ```markdown
 ---
@@ -189,19 +224,21 @@ A descrição do PR tem:
 
   | dia | horário | tipo | gancho | primeira linha | imagem |
   | --- | --- | --- | --- | --- | --- |
-  | ter 06/10 | 08:15 | PROOF | #17 Time Anchor | Em março eu perdi... | gerada: diagrama |
-  | qua 07/10 | 08:00 | OPINION | #1 Contrarian | ... | sem imagem |
-  | qui 08/10 | 07:45 | TEACH | #21 Direct Value | ... | **pedida** |
+  | ter 06/10 | 08:15 | PROOF | #17 Time Anchor | Em março eu perdi... | pedida (reserva: diagrama) |
+  | qua 07/10 | 08:00 | OPINION | #1 Contrarian | ... | pedida (reserva: ilustração) |
+  | qui 08/10 | 07:45 | TEACH | #21 Direct Value | ... | foto sua: setup-noite.jpg |
 
 - A nota do `detect.py` de cada post.
 - Uma seção **"Falta você preencher"** listando cada `{{...}}`, em qual
   arquivo e o que é necessário. Se não houver, diga "Nada a preencher".
 - Uma seção **"Imagens"**: as geradas (com link pro arquivo, pra ele ver no
-  celular) e, pra cada `image_request`, **o que ele deve mandar**: o que
-  mostrar, o que esconder, formato (print ou foto) e em qual post entra.
-  Explique que ele pode mandar a imagem numa sessão do Claude ("adiciona esta
-  imagem no post X do PR N") ou subir em `media/fotos/` pelo GitHub e trocar
-  `image_request` por `image` + `image_alt`. Sem imagem, o post sai só com texto.
+  celular), com uma linha sobre a ideia de cada uma, e, pra cada
+  `image_request`, **o que ele deve mandar**: o que mostrar, o que esconder,
+  formato (print ou foto) e em qual post entra. Explique que ele pode mandar
+  a imagem numa sessão do Claude ("adiciona esta imagem no post X do PR N")
+  ou subir em `media/fotos/` pelo GitHub, trocar o `image` pela foto dele,
+  ajustar o `image_alt` e apagar o `image_request`. Se não mandar, o post
+  sai com a reserva.
 - Um lembrete: "Merge = aprovação. Edite os arquivos direto no PR se quiser
   mudar algo."
 

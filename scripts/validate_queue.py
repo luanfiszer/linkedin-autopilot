@@ -7,6 +7,8 @@ Checa, para cada arquivo:
   - scheduled_at no futuro e com fuso
   - texto entre 400 e 3.000 caracteres
   - nenhum placeholder {{...}} sobrando
+  - imagem em todo post (image_request sozinho não basta: precisa de uma reserva)
+  - imagem gerada (gerado-*) com a fonte em media/fotos/fontes/
   - detect.py --lang pt com nota >= 70
   - no máximo 1 post por dia (contando approved/ e published/, no fuso de SP)
   - nenhum termo de linkedin/blocklist.txt (compliance da empresa atual)
@@ -76,13 +78,16 @@ def validate_post(post: q.Post, now: datetime, lex, blocklist=None) -> list[str]
     placeholders = PLACEHOLDER_RE.findall(post.body + "\n" + post.raw_front)
     if placeholders:
         errs.append("placeholder sem preencher: " + ", ".join(sorted(set(placeholders))))
-    texts = [post.body, str(post.meta.get("hook", "")), str(post.meta.get("image_alt", ""))]
+    texts = [post.body] + [str(post.meta.get(k, "")) for k in ("hook", "image_alt", "image_request")]
     img = post.image_path
-    if img is not None and img.name.startswith("gerado-"):
+    if img is None:
+        errs.append("post sem imagem: todo post precisa de image. Se pediu foto ao Luan "
+                    "(image_request), deixe uma imagem reserva em image")
+    elif img.name.startswith("gerado-"):
         fontes = sorted((q.PHOTOS / "fontes").glob(img.stem + ".*"))
         if not fontes:
             errs.append(f"imagem gerada sem fonte: falta media/fotos/fontes/{img.stem}.<ext> "
-                        "(o código ou YAML que gerou a imagem)")
+                        "(o código, YAML ou SVG que gerou a imagem)")
         texts += [f.read_text(encoding="utf-8", errors="ignore") for f in fontes]
     hits = blocked_terms("\n".join(texts), load_blocklist() if blocklist is None else blocklist)
     if hits:

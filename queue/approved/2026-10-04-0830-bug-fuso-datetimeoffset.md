@@ -4,6 +4,9 @@ visibility: PUBLIC
 type: STORY
 hook: "#9 Story Cold Open"
 human_score: 70.1
+image: "media/fotos/gerado-fuso-dois-relogios.png"
+image_alt: "Ilustração: dois relógios marcam o mesmo instante, um em UTC (11h) e outro em -03:00 (8h)"
+image_request: "Print do app Relógio do celular com São Paulo e Reykjavík (que fica em UTC o ano todo) lado a lado, ou foto de um rascunho à mão da linha do tempo. Nada de tela do trabalho."
 ---
 Um dado antigo estava vencendo um dado novo. O culpado era o fuso horário.
 

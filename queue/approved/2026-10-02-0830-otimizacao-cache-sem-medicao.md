@@ -4,6 +4,9 @@ visibility: PUBLIC
 type: STORY
 hook: "#20 The Walk-Away"
 human_score: 71.9
+image: "media/fotos/gerado-cache-limiar.png"
+image_alt: "Ilustração: régua marca o mínimo de 4.096 tokens pro cache; a pilha de uma conversa real fica bem abaixo"
+image_request: "Print do registro de aprendizados ou do ADR do projeto pessoal em que você anotou a remoção do prompt caching (título e o trecho dos 4.096 tokens). Esconda o nome do projeto."
 ---
 Eu aprovei uma otimização de cache e derrubei ela no mesmo dia.
 

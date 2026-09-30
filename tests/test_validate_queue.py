@@ -4,17 +4,46 @@ import pytest
 
 import queue_lib as q
 import validate_queue
-from helpers import BOM, write_post
+import helpers
+from helpers import BOM
 
 NOW = datetime(2026, 9, 25, 12, 0, tzinfo=q.TZ)
 RUIM = (q.ROOT / "tests" / "fixtures" / "pt_ruim.txt").read_text(encoding="utf-8").strip()
+FOTO = 'image: "media/fotos/setup.jpg"\nimage_alt: "Mesa com notebook"\n'
+
+
+def write_post(directory, when, extra="", **kw):
+    """Post válido tem imagem: põe uma por padrão (sem_imagem=True tira)."""
+    return helpers.write_post(directory, when, extra=("" if kw.pop("sem_imagem", False) else FOTO) + extra, **kw)
 
 
 @pytest.fixture
-def dirs(tmp_path):
+def dirs(tmp_path, monkeypatch):
+    monkeypatch.setattr(q, "ROOT", tmp_path)
+    monkeypatch.setattr(q, "PHOTOS", tmp_path / "media" / "fotos")
+    q.PHOTOS.mkdir(parents=True)
+    (q.PHOTOS / "setup.jpg").write_bytes(b"\xff\xd8\xff\xdb" + b"\x00" * 200 + b"\xff\xd9")
     a, p = tmp_path / "approved", tmp_path / "published"
     a.mkdir(), p.mkdir()
     return a, p
+
+
+def test_post_sem_imagem_e_barrado(dirs, capsys):
+    path = write_post(dirs[0], NOW + timedelta(days=4), sem_imagem=True)
+    assert validate(dirs, path) == 1
+    assert "post sem imagem" in capsys.readouterr().out
+
+
+def test_so_image_request_sem_reserva_e_barrado(dirs, capsys):
+    path = write_post(dirs[0], NOW + timedelta(days=4), sem_imagem=True,
+                      extra='image_request: "Print do app"\n')
+    assert validate(dirs, path) == 1
+    assert "reserva" in capsys.readouterr().out
+
+
+def test_reserva_com_image_request_passa(dirs):
+    path = write_post(dirs[0], NOW + timedelta(days=4), extra='image_request: "Print do app"\n')
+    assert validate(dirs, path) == 0
 
 
 def validate(dirs, *files):

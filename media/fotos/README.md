@@ -1,14 +1,19 @@
 # Imagens dos posts
 
-Nem todo post precisa de imagem: no máximo 2 por semana. A rotina decide post a
-post e faz uma destas três coisas:
+Todo post sai com imagem. A preferida é sempre uma foto ou print **seu**; a
+gerada é só a reserva. A rotina decide post a post:
 
-- **gera** um diagrama ou um cartão de código genérico (`scripts/gerar_imagem.py`),
-  com cara de material técnico, nunca de IA;
-- **usa** um print ou foto que você já deixou nesta pasta;
-- **pede** a você, no PR, exatamente o que mandar (`image_request`).
+- **usa** um print ou foto que você já deixou nesta pasta; se não tiver,
+- **pede** a você, no PR, exatamente o que mandar (`image_request`) **e** deixa
+  uma imagem reserva no post:
+  - um diagrama ou um cartão de código genérico (`scripts/gerar_imagem.py`), ou
+  - uma ilustração desenhada em SVG (metáfora com objetos, estilo editorial
+    chapado, sem pessoas).
 
-Nunca: imagem gerada por IA, print falso, imagem da internet.
+Se você mandar a sua, ela substitui a reserva. Toda imagem gerada é
+`gerado-*.png`, com a fonte (YAML, código ou SVG) em `fontes/`.
+
+Nunca: imagem gerada por IA com pessoas ou cena fantasiosa, print falso, imagem da internet.
 
 ## Prints
 

@@ -6,6 +6,7 @@ hook: "#21 The Direct Value"
 human_score: 76.5
 image: "media/fotos/gerado-json-extension-data.png"
 image_alt: "Diagrama: dois processos gravam o mesmo JSON, campo desconhecido some no round-trip sem JsonExtensionData"
+image_request: "Foto de um rascunho à mão (caderno ou quadro) com os dois processos gravando o mesmo JSON e o campo sumindo no round-trip. Nada de tela nem código do trabalho."
 ---
 Aqui está a correção exata que uso quando dois processos escrevem no mesmo JSON. Rouba.
 

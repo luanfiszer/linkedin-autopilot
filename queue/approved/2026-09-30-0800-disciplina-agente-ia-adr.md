@@ -4,6 +4,9 @@ visibility: PUBLIC
 type: OPINION
 hook: "#15 The Warning"
 human_score: 79.2
+image: "media/fotos/gerado-agente-ia-adr.png"
+image_alt: "Ilustração: nuvem de pensamento se desfazendo e, ao lado, fichas guardadas numa gaveta de arquivo"
+image_request: "Print da pasta de ADRs do seu projeto pessoal (lista de arquivos, só os títulos), no editor ou no GitHub. Esconda o nome do projeto e os caminhos de pasta."
 ---
 Confiar na memória do agente de IA está te custando retrabalho que você nem percebe.
 

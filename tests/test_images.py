@@ -152,3 +152,26 @@ def test_gerador_produz_png_sem_exif(tmp_path):
         pytest.skip(f"sem fonte TrueType neste ambiente: {exc}")
     assert out.name == "gerado-d.png" and code.name == "gerado-c.png"
     assert out.read_bytes()[:4] == b"\x89PNG"
+
+
+
+SVG = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">'
+       '<rect width="1600" height="900" fill="#F3EEE4"/><circle cx="800" cy="450" r="200" fill="#2F4A4F"/>'
+       '<text x="800" y="800" font-family="sans-serif" font-size="40">relógio</text></svg>')
+
+
+def test_svg_vira_png_e_guarda_fonte(tmp_path):
+    import gerar_imagem
+    from PIL import Image
+    out = gerar_imagem.render_svg(SVG, tmp_path / "fotos" / "relogio.png")
+    assert out.name == "gerado-relogio.png"
+    assert Image.open(out).size == (1600, 900)
+    assert (tmp_path / "fotos" / "fontes" / "gerado-relogio.svg").read_text(encoding="utf-8") == SVG
+
+
+@pytest.mark.parametrize("ref", ['<image href="https://x.com/a.jpg"/>', "<image xlink:href='//x.com/a.jpg'/>",
+                                 '<image href="file:///etc/a.png"/>'])
+def test_svg_com_imagem_externa_e_recusado(tmp_path, ref):
+    import gerar_imagem
+    with pytest.raises(SystemExit, match="externa"):
+        gerar_imagem.render_svg(SVG.replace("</svg>", ref + "</svg>"), tmp_path / "x.png")

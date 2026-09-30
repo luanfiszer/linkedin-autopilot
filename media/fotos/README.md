@@ -7,8 +7,8 @@ gerada é só a reserva. A rotina decide post a post:
 - **pede** a você, no PR, exatamente o que mandar (`image_request`) **e** deixa
   uma imagem reserva no post:
   - um diagrama ou um cartão de código genérico (`scripts/gerar_imagem.py`), ou
-  - uma ilustração desenhada em SVG (metáfora com objetos, estilo editorial
-    chapado, sem pessoas).
+  - um infográfico desenhado em SVG que explica o post sozinho (passos,
+    antes/depois, o detalhe técnico), sem pessoas.
 
 Se você mandar a sua, ela substitui a reserva. Toda imagem gerada é
 `gerado-*.png`, com a fonte (YAML, código ou SVG) em `fontes/`.

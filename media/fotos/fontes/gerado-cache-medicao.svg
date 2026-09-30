@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="95" font-size="52" font-weight="700" fill="#1F2A2C">Otimização sem medição é chute</text>
+  <text x="80" y="145" font-size="28" fill="#6B6358">Prompt caching no meu projeto pessoal: aprovado e derrubado no mesmo dia.</text>
+
+  <!-- linha do tempo -->
+  <line x1="130" y1="250" x2="130" y2="730" stroke="#D9CFBF" stroke-width="6"/>
+  <g font-size="30" fill="#1F2A2C">
+    <circle cx="130" cy="250" r="30" fill="#2F4A4F"/><text x="130" y="261" text-anchor="middle" fill="#FFFDF8" font-weight="700">1</text>
+    <text x="185" y="242" font-weight="700">Implementei</text>
+    <text x="185" y="280" font-size="24" fill="#6B6358">prefixo fixo repetido em toda chamada</text>
+
+    <circle cx="130" cy="410" r="30" fill="#2F4A4F"/><text x="130" y="421" text-anchor="middle" fill="#FFFDF8" font-weight="700">2</text>
+    <text x="185" y="402" font-weight="700">Subi</text>
+    <text x="185" y="440" font-size="24" fill="#6B6358">e assumi que já estava economizando</text>
+
+    <circle cx="130" cy="570" r="30" fill="#C99A63"/><text x="130" y="581" text-anchor="middle" fill="#FFFDF8" font-weight="700">3</text>
+    <text x="185" y="562" font-weight="700">Medi</text>
+    <text x="185" y="600" font-size="24" fill="#6B6358">antes de comemorar</text>
+
+    <circle cx="130" cy="730" r="30" fill="#C0563B"/><text x="130" y="741" text-anchor="middle" fill="#FFFDF8" font-weight="700">4</text>
+    <text x="185" y="722" font-weight="700" fill="#C0563B">Derrubei no mesmo dia</text>
+    <text x="185" y="760" font-size="24" fill="#6B6358">uma peça a mais para economizar nada</text>
+  </g>
+
+  <!-- o que a medição mostrou -->
+  <rect x="740" y="200" width="780" height="620" rx="16" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="780" y="260" font-size="30" font-weight="700" fill="#2F4A4F">O que a medição mostrou</text>
+  <text x="780" y="300" font-size="24" fill="#6B6358">tamanho do prefixo, em tokens</text>
+
+  <!-- régua -->
+  <rect x="800" y="520" width="660" height="28" rx="14" fill="#E6DDCD"/>
+  <text x="800" y="590" font-size="22" fill="#6B6358">0</text>
+
+  <!-- conversas reais: só se sabe que ficavam abaixo de 4.096 -->
+  <path d="M805 500 v-22 h630 v22" fill="none" stroke="#8A6A3F" stroke-width="4" stroke-linejoin="round"/>
+  <text x="1120" y="462" font-size="24" font-weight="700" fill="#8A6A3F" text-anchor="middle">conversas reais do app: nunca chegavam lá</text>
+
+  <!-- 1.024 assumido -->
+  <line x1="965" y1="600" x2="965" y2="620" stroke="#9AA6A8" stroke-width="4"/>
+  <line x1="965" y1="555" x2="965" y2="610" stroke="#9AA6A8" stroke-width="4" stroke-dasharray="6 6"/>
+  <text x="965" y="660" font-size="26" font-weight="700" fill="#6B6358" text-anchor="middle">1.024</text>
+  <text x="965" y="694" font-size="22" fill="#6B6358" text-anchor="middle">o que eu assumi</text>
+  <line x1="925" y1="652" x2="1005" y2="652" stroke="#6B6358" stroke-width="3"/>
+
+  <!-- 4.096 real -->
+  <line x1="1460" y1="380" x2="1460" y2="570" stroke="#C0563B" stroke-width="6"/>
+  <text x="1460" y="355" font-size="34" font-weight="700" fill="#C0563B" text-anchor="end">4.096</text>
+  <text x="1440" y="398" font-size="22" fill="#C0563B" text-anchor="end">mínimo real para</text>
+  <text x="1440" y="426" font-size="22" fill="#C0563B" text-anchor="end">o cache engatar</text>
+
+  <text x="780" y="770" font-size="24" fill="#1F2A2C">Resultado: o cache nunca engatava.</text>
+</svg>

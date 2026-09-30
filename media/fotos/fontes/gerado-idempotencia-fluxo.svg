@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="95" font-size="52" font-weight="700" fill="#1F2A2C">Idempotência no banco, não no cache</text>
+  <text x="80" y="145" font-size="28" fill="#6B6358">A rede cai no upload, o app reenvia o mesmo áudio. A fala não pode ser processada duas vezes.</text>
+
+  <!-- celular -->
+  <rect x="90" y="230" width="170" height="300" rx="26" fill="#2F4A4F"/>
+  <rect x="106" y="262" width="138" height="236" rx="10" fill="#FFFDF8"/>
+  <rect x="150" y="244" width="50" height="8" rx="4" fill="#1F3337"/>
+  <circle cx="175" cy="340" r="30" fill="#3E7C78"/>
+  <rect x="167" y="320" width="16" height="28" rx="8" fill="#FFFDF8"/>
+  <path d="M160 340 a15 15 0 0 0 30 0 M175 355 v10" fill="none" stroke="#FFFDF8" stroke-width="4" stroke-linecap="round"/>
+  <g fill="#C9BFAE"><rect x="125" y="400" width="100" height="10" rx="5"/><rect x="125" y="422" width="75" height="10" rx="5"/></g>
+  <text x="175" y="570" font-size="24" fill="#6B6358" text-anchor="middle">app</text>
+
+  <!-- requisições -->
+  <g font-size="24">
+    <rect x="310" y="235" width="380" height="96" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="335" y="273" font-weight="700" fill="#1F2A2C">1º envio do áudio</text>
+    <text x="335" y="310" font-family="monospace" font-size="21" fill="#3E7C78">header: chave = k-81f</text>
+
+    <rect x="310" y="410" width="380" height="96" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="335" y="448" font-weight="700" fill="#1F2A2C">Reenvio (a rede caiu)</text>
+    <text x="335" y="485" font-family="monospace" font-size="21" fill="#3E7C78">header: chave = k-81f</text>
+  </g>
+  <path d="M700 283 H760 M700 458 H760" stroke="#2F4A4F" stroke-width="5" stroke-linecap="round"/>
+  <path d="M746 268 l16 15 l-16 15 M746 443 l16 15 l-16 15" fill="none" stroke="#2F4A4F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- postgres -->
+  <rect x="780" y="215" width="360" height="310" rx="16" fill="#2F4A4F"/>
+  <text x="810" y="262" font-size="28" font-weight="700" fill="#FFFDF8">Postgres</text>
+  <text x="810" y="296" font-size="22" fill="#C9D6D4">um registro por fala</text>
+  <rect x="810" y="320" width="300" height="175" rx="8" fill="#FFFDF8"/>
+  <rect x="810" y="320" width="300" height="46" rx="8" fill="#E6DDCD"/>
+  <text x="830" y="351" font-family="monospace" font-size="21" font-weight="700" fill="#1F2A2C">chave</text>
+  <text x="935" y="351" font-size="18" font-weight="700" fill="#C0563B">UNIQUE</text>
+  <text x="830" y="405" font-family="monospace" font-size="21" fill="#1F2A2C">k-81f</text>
+  <line x1="820" y1="425" x2="1100" y2="425" stroke="#E6DDCD" stroke-width="2"/>
+  <text x="830" y="465" font-family="monospace" font-size="21" fill="#9AA6A8">...</text>
+
+  <!-- resultados -->
+  <path d="M1150 283 H1210 M1150 458 H1210" stroke="#2F4A4F" stroke-width="5" stroke-linecap="round"/>
+  <path d="M1196 268 l16 15 l-16 15 M1196 443 l16 15 l-16 15" fill="none" stroke="#2F4A4F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="1230" y="235" width="290" height="96" rx="12" fill="#3E7C78"/>
+  <text x="1255" y="273" font-size="24" font-weight="700" fill="#FFFDF8">Registro criado</text>
+  <text x="1255" y="308" font-size="22" fill="#FFFDF8">e o trabalho vai pra fila</text>
+  <rect x="1230" y="410" width="290" height="96" rx="12" fill="#C0563B"/>
+  <text x="1255" y="448" font-size="24" font-weight="700" fill="#FFFDF8">Recusado</text>
+  <text x="1255" y="483" font-size="22" fill="#FFFDF8">nada é processado 2x</text>
+
+  <!-- contraste -->
+  <rect x="80" y="610" width="700" height="210" rx="16" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="115" y="662" font-size="26" font-weight="700" fill="#6B6358">Plano inicial: trava no Redis (SETNX)</text>
+  <text x="115" y="708" font-size="23" fill="#1F2A2C">Risco: o processo cair entre criar o</text>
+  <text x="115" y="742" font-size="23" fill="#1F2A2C">registro no Postgres e colocar na fila.</text>
+  <text x="115" y="786" font-size="23" fill="#C0563B">Ali, a trava do Redis não resolve.</text>
+
+  <rect x="820" y="610" width="700" height="210" rx="16" fill="#3E7C78"/>
+  <text x="855" y="662" font-size="26" font-weight="700" fill="#FFFDF8">Agora: a chave mora no próprio registro</text>
+  <text x="855" y="708" font-size="23" fill="#FFFDF8">Criar o registro e reservar a chave</text>
+  <text x="855" y="742" font-size="23" fill="#FFFDF8">viraram uma coisa só.</text>
+  <text x="855" y="786" font-size="23" font-weight="700" fill="#FFFDF8">O banco decide. Fila e cache só aceleram.</text>
+</svg>

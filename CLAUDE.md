@@ -97,26 +97,31 @@ reserva. Para cada post:
    "jeito errado x jeito certo". Salve a saída como
    `media/fotos/gerado-<slug>.png` e a fonte (o YAML ou o código) em
    `media/fotos/fontes/gerado-<slug>.<ext>`.
-4. **Reserva: ilustração em SVG (quando diagrama/código não faz sentido).** Típico de
-   STORY, OFFER e OPINION sem conteúdo técnico. Você mesmo desenha um SVG
-   (`viewBox="0 0 1600 900"`, `font-family="sans-serif"`) num arquivo
-   temporário e roda
+4. **Reserva: infográfico em SVG (quando diagrama/código não basta).** Você
+   mesmo desenha um SVG (`viewBox="0 0 1600 900"`, `font-family="sans-serif"`,
+   `"monospace"` pra código) num arquivo temporário e roda
    `python3 scripts/gerar_imagem.py svg /tmp/cena.svg -o media/fotos/gerado-<slug>.png`.
-   O script converte para PNG e guarda o SVG como fonte. A cena:
-   - é uma **metáfora visual com objetos** do tema do post (ex.: fila: caixas
-     numa esteira; fuso: dois relógios, UTC e -03:00, no mesmo instante;
-     memória x documento: nuvem de pensamento se desfazendo e fichas num
-     arquivo);
-   - estilo editorial chapado: fundo claro (`#F3EEE4`), 3 ou 4 cores sóbrias
-     (`#2F4A4F`, `#3E7C78`, `#C99A63`, `#C0563B` pra destaque), formas
-     simples, sem gradiente, brilho ou sombra;
-   - texto só se ajudar (um rótulo curto, uma legenda), sempre com acento
-     certo, e todo número tem que estar no post;
-   - nunca tem pessoas, rostos ou mãos, nem imagem externa (`<image href>`
-     é recusado);
-   - nunca finge ser foto do Luan nem prova de algo que o post conta.
-   Abra o PNG com Read. Se estiver confuso, feio ou com texto cortado,
-   simplifique e gere de novo.
+   O script converte para PNG e guarda o SVG como fonte. **A imagem tem que
+   explicar o post sozinha**, pra quem não leu o texto. Metáfora solta (uma
+   nuvem, uma gaveta) é vaga demais: use no máximo como ícone de apoio.
+   Estrutura que funciona:
+   - título com a tese do post (52px, negrito) e uma linha de contexto;
+   - o mecanismo desenhado: passos numerados, antes/depois, "o que quebra"
+     (vermelho) x "a correção" (verde-azulado), com rótulos curtos;
+   - o detalhe técnico real do post (nome do atributo, do tipo, da coluna,
+     o trecho de código genérico) em fonte monoespaçada;
+   - exemplo com valores só quando ajuda a entender, marcado "exemplo
+     ilustrativo", e nunca como se fosse dado real;
+   - estilo: fundo `#F3EEE4`, texto `#1F2A2C`, cinza `#6B6358`, cartões
+     `#FFFDF8` com borda `#D9CFBF`, `#2F4A4F`/`#3E7C78` pro certo,
+     `#C0563B` pro erro, `#C99A63` de apoio; formas chapadas, sem gradiente;
+   - todo texto com acento certo, todo fato e número tirado do post (se a
+     fonte não diz quanto, não desenhe barra com tamanho: use uma chave ou um
+     rótulo);
+   - nunca pessoas, rostos ou mãos, nem imagem externa (`<image href>` é
+     recusado); nunca finge ser print ou foto do Luan.
+   Abra o PNG com Read. Confira texto cortado ou sobreposto, contraste e se
+   dá pra entender no celular; corrija e gere de novo.
 5. **O pedido (`image_request`).** Uma frase dizendo o que ele deve mandar,
    pensada pra ser fácil de fazer em poucos minutos: print do projeto
    pessoal (ADR, teste passando, app no celular), foto de um rascunho à mão
@@ -128,7 +133,7 @@ reserva. Para cada post:
    Se ele mandar, a foto dele substitui a reserva; se não, o post sai com a
    reserva. Nunca deixe só o `image_request`.
 
-Varie: não repita a mesma metáfora de uma semana pra outra.
+Varie o layout (passos, antes/depois, fluxo) de um post pro outro.
 
 Abra toda imagem gerada com Read e confira se ficou legível antes de usar. A
 validação exige a fonte (`media/fotos/fontes/<nome>.<ext>`) de toda imagem

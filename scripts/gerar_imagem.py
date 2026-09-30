@@ -13,7 +13,8 @@ Uso
   python scripts/gerar_imagem.py diagrama fluxo.yml -o media/fotos/gerado-outbox-fluxo.png
   python scripts/gerar_imagem.py svg fila.svg -o media/fotos/gerado-fila-esteira.png
 
-A ilustração SVG deve ter viewBox 0 0 1600 900 e usar font-family="sans-serif".
+A ilustração SVG deve ter viewBox 0 0 1600 900 e usar font-family="sans-serif"
+(ou "monospace" para código).
 O SVG é copiado para media/fotos/fontes/gerado-<nome>.svg (a fonte exigida pela
 validação). Referências externas (<image href="http...">) são recusadas.
 
@@ -238,10 +239,10 @@ def render_svg(svg: str, out: Path) -> Path:
     if EXTERNAL_REF.search(svg):
         sys.exit("SVG com referência externa (imagem da internet ou arquivo): desenhe tudo no próprio SVG.")
     import resvg_py
-    sans = next((c for c in SANS_CANDIDATES if Path(c).exists()), None)
-    family = "DejaVu Sans" if sans and "dejavu" in sans.lower() else "Helvetica Neue"
-    png = resvg_py.svg_to_bytes(svg_string=svg, width=SVG_W, height=SVG_H,
-                                sans_serif_family=family, font_family=family)
+    linux = any("dejavu" in c.lower() and Path(c).exists() for c in SANS_CANDIDATES)
+    family, mono_family = ("DejaVu Sans", "DejaVu Sans Mono") if linux else ("Helvetica Neue", "Menlo")
+    png = resvg_py.svg_to_bytes(svg_string=svg, width=SVG_W, height=SVG_H, font_family=family,
+                                sans_serif_family=family, monospace_family=mono_family)
     out = _prefixed(out, "gerado-")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(bytes(png))

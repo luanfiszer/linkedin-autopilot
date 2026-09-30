@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="95" font-size="52" font-weight="700" fill="#1F2A2C">Round-trip que apaga um campo em silêncio</text>
+  <text x="80" y="145" font-size="28" fill="#6B6358">Dois processos gravam o mesmo JSON. Um deles lê para uma classe C#, altera e regrava.</text>
+
+  <!-- coluna 1 -->
+  <text x="80" y="215" font-size="26" font-weight="700" fill="#2F4A4F">1. O JSON no arquivo</text>
+  <rect x="80" y="235" width="420" height="230" rx="14" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <g font-family="monospace" font-size="26" fill="#1F2A2C">
+    <text x="110" y="290">{</text>
+    <text x="135" y="335">"campoA": "do A",</text>
+    <text x="135" y="380"><tspan fill="#3E7C78" font-weight="700">"campoB": "do B"</tspan></text>
+    <text x="110" y="425">}</text>
+  </g>
+  <text x="80" y="505" font-size="22" fill="#6B6358">campoB foi gravado pelo outro processo</text>
+
+  <!-- seta -->
+  <path d="M520 350 H585" stroke="#2F4A4F" stroke-width="6" stroke-linecap="round"/>
+  <path d="M570 333 l20 17 l-20 17" fill="none" stroke="#2F4A4F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- coluna 2 -->
+  <text x="610" y="215" font-size="26" font-weight="700" fill="#2F4A4F">2. A classe só declara campoA</text>
+  <rect x="610" y="235" width="420" height="230" rx="14" fill="#2F4A4F"/>
+  <g font-family="monospace" font-size="25" fill="#F3EEE4">
+    <text x="640" y="290"><tspan fill="#E8C9A0">class</tspan> Doc</text>
+    <text x="640" y="335">{</text>
+    <text x="665" y="380"><tspan fill="#E8C9A0">string</tspan> CampoA;</text>
+    <text x="640" y="425">}</text>
+  </g>
+  <text x="610" y="505" font-size="22" fill="#6B6358">lê, altera campoA, regrava</text>
+
+  <path d="M1050 350 H1115" stroke="#2F4A4F" stroke-width="6" stroke-linecap="round"/>
+  <path d="M1100 333 l20 17 l-20 17" fill="none" stroke="#2F4A4F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- coluna 3 -->
+  <text x="1140" y="215" font-size="26" font-weight="700" fill="#C0563B">3. Depois do round-trip</text>
+  <rect x="1140" y="235" width="380" height="230" rx="14" fill="#FFFDF8" stroke="#C0563B" stroke-width="4"/>
+  <g font-family="monospace" font-size="26" fill="#1F2A2C">
+    <text x="1170" y="290">{</text>
+    <text x="1195" y="335">"campoA": "novo"</text>
+    <text x="1195" y="380" fill="#C0563B" opacity="0.55">"campoB": "do B"</text>
+    <text x="1170" y="425">}</text>
+  </g>
+  <line x1="1190" y1="371" x2="1445" y2="371" stroke="#C0563B" stroke-width="4"/>
+  <text x="1140" y="505" font-size="22" font-weight="700" fill="#C0563B">campoB sumiu: sem erro, sem log</text>
+
+  <!-- correção -->
+  <rect x="80" y="570" width="1440" height="250" rx="16" fill="#3E7C78"/>
+  <text x="120" y="630" font-size="30" font-weight="700" fill="#FFFDF8">A correção: guardar o que a classe não conhece</text>
+  <rect x="120" y="660" width="860" height="125" rx="10" fill="#2F4A4F"/>
+  <g font-family="monospace" font-size="25" fill="#F3EEE4">
+    <text x="150" y="710"><tspan fill="#E8C9A0">[JsonExtensionData]</tspan></text>
+    <text x="150" y="755"><tspan fill="#E8C9A0">IDictionary</tspan>&lt;string, JsonElement&gt; Extra;</text>
+  </g>
+  <text x="1020" y="700" font-size="26" fill="#FFFDF8">Chave sem propriedade vai</text>
+  <text x="1020" y="738" font-size="26" fill="#FFFDF8">para Extra e volta intacta</text>
+  <text x="1020" y="776" font-size="26" fill="#FFFDF8">quando o JSON é regravado.</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="95" font-size="52" font-weight="700" fill="#1F2A2C">Quando o dado antigo vence o novo</text>
+  <text x="80" y="145" font-size="28" fill="#6B6358">Regra: entre duas versões do mesmo registro, vence a mais recente.</text>
+  <text x="1520" y="95" font-size="22" fill="#9AA6A8" text-anchor="end">exemplo ilustrativo</text>
+
+  <!-- versão A -->
+  <rect x="80" y="200" width="560" height="200" rx="16" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="115" y="250" font-size="26" font-weight="700" fill="#6B6358">Versão A (a mais antiga)</text>
+  <text x="115" y="325" font-family="monospace" font-size="46" font-weight="700" fill="#1F2A2C">11:00</text>
+  <text x="290" y="325" font-size="26" fill="#6B6358">em UTC</text>
+  <text x="115" y="370" font-size="22" fill="#6B6358">comparada em UTC</text>
+
+  <!-- versão B -->
+  <rect x="700" y="200" width="820" height="200" rx="16" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="735" y="250" font-size="26" font-weight="700" fill="#6B6358">Versão B (a mais nova)</text>
+  <text x="735" y="325" font-family="monospace" font-size="46" font-weight="700" fill="#1F2A2C">12:00</text>
+  <text x="910" y="325" font-size="26" fill="#6B6358">no banco (timestamptz)</text>
+  <path d="M1200 315 H1260" stroke="#C0563B" stroke-width="5" stroke-linecap="round"/>
+  <path d="M1246 301 l15 14 l-15 14" fill="none" stroke="#C0563B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1280" y="325" font-family="monospace" font-size="46" font-weight="700" fill="#C0563B">09:00</text>
+  <text x="735" y="370" font-size="22" fill="#C0563B">lida como DateTime no modo legado: volta no fuso do processo (-03:00)</text>
+
+  <!-- comparação errada -->
+  <rect x="80" y="440" width="1440" height="130" rx="16" fill="#C0563B"/>
+  <path d="M130 480 l50 50 M180 480 l-50 50" stroke="#FFFDF8" stroke-width="10" stroke-linecap="round"/>
+  <text x="220" y="497" font-size="28" font-weight="700" fill="#FFFDF8">Antes: compara 11:00 com 09:00 e a versão A vence</text>
+  <text x="220" y="540" font-size="24" fill="#FFFDF8">O resultado depende de onde o código roda. Nos testes locais, nunca apareceu.</text>
+
+  <!-- correção -->
+  <rect x="80" y="600" width="1440" height="150" rx="16" fill="#3E7C78"/>
+  <path d="M125 680 l22 24 l42 -52" fill="none" stroke="#FFFDF8" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="220" y="650" font-size="28" font-weight="700" fill="#FFFDF8">Depois: DateTimeOffset guarda o fuso junto com a data</text>
+  <text x="220" y="695" font-family="monospace" font-size="26" fill="#FFFDF8">09:00-03:00 = 12:00+00:00 &gt; 11:00+00:00</text>
+  <text x="220" y="732" font-size="24" fill="#FFFDF8">A versão B vence, em qualquer fuso.</text>
+
+  <text x="80" y="815" font-size="26" fill="#1F2A2C">E um teste de regressão com a data explícita em -03:00, pra esse bug não voltar escondido.</text>
+</svg>

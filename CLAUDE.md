@@ -66,8 +66,10 @@ respostas de `voice.md` e `ideias.md`; o que faltar vira `{{...}}` no plano.
 
 O plano tem 4 posts com este mix: **PROOF, OPINION, TEACH e (STORY ou OFFER)**,
 nunca dois do mesmo tipo seguidos. Horários no fuso **America/Sao_Paulo**
-(`-03:00`), no máximo **1 post por dia**. Padrão da skill: terça a quinta,
-7h30-9h30; segunda à tarde e sexta de manhã como segunda opção.
+(`-03:00`), no máximo **1 post por dia**, sempre **entre 7h30 e 9h30**:
+terça a quinta de preferência, sexta de manhã como segunda opção. Nada à
+tarde: o publicador só é pontual de manhã (uma execução de madrugada espera
+até o horário exato); fora disso o post pode sair com horas de atraso.
 
 ### 3. Escrever os 4 posts
 
@@ -326,6 +328,7 @@ do Mac.
 | `queue/published/` | posts publicados, com `posted_urn` |
 | `scripts/get_token.py` | OAuth local para gerar o token |
 | `scripts/li_publish.py` | publicador (Actions) |
+| `scripts/esperar_proximo.py` | faz a execução da madrugada esperar o horário exato do post |
 | `scripts/validate_queue.py` | validação dos PRs |
 
 ## Desenvolvimento

@@ -6,6 +6,10 @@ hook: "#15 The Warning"
 human_score: 79.2
 image: "media/fotos/gerado-agente-ia-adr-infografico.png"
 image_alt: "Infográfico: regra só na cabeça é desfeita pela próxima sessão; ADR, checagem no build e teste resolvem"
+posted_urn: "urn:li:share:7511080604667674625"
+posted_at: "2026-09-30T12:12:45-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQGlTMOpqBJ1hg"
 ---
 Confiar na memória do agente de IA está te custando retrabalho que você nem percebe.
 

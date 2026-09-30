@@ -235,9 +235,9 @@ EXTERNAL_REF = re.compile(r"""(?:href|src)\s*=\s*["'](?:https?:|//|file:)""", re
 
 def render_svg(svg: str, out: Path) -> Path:
     """Converte a ilustração SVG em PNG 1600x900 e guarda o SVG como fonte."""
-    import resvg_py
     if EXTERNAL_REF.search(svg):
         sys.exit("SVG com referência externa (imagem da internet ou arquivo): desenhe tudo no próprio SVG.")
+    import resvg_py
     sans = next((c for c in SANS_CANDIDATES if Path(c).exists()), None)
     family = "DejaVu Sans" if sans and "dejavu" in sans.lower() else "Helvetica Neue"
     png = resvg_py.svg_to_bytes(svg_string=svg, width=SVG_W, height=SVG_H,

@@ -7,6 +7,10 @@ human_score: 79.2
 image: "media/fotos/gerado-agente-ia-adr.png"
 image_alt: "Ilustração: nuvem de pensamento se desfazendo e, ao lado, fichas guardadas numa gaveta de arquivo"
 image_request: "Print da pasta de ADRs do seu projeto pessoal (lista de arquivos, só os títulos), no editor ou no GitHub. Esconda o nome do projeto e os caminhos de pasta."
+posted_urn: "urn:li:share:7511058453625466880"
+posted_at: "2026-09-30T10:44:44-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQHDc1vLQncHTg"
 ---
 Confiar na memória do agente de IA está te custando retrabalho que você nem percebe.
 

@@ -1,8 +1,14 @@
 name: Publicar no LinkedIn
 
+# O agendamento do GitHub não é pontual: atrasa horas e pula execuções, e o
+# minuto cheio é o mais congestionado. Por isso os minutos quebrados e a
+# estratégia: execuções de madrugada (02h23 a 08h23 em SP) que, se o post do
+# dia estiver a menos de 5h30, esperam até o horário exato (esperar_proximo.py).
+# A cada 2 h, uma execução de reserva publica o que tiver atrasado.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "23 5-11 * * *"   # 02h23 a 08h23 em SP (UTC-3), de hora em hora
+    - cron: "53 */2 * * *"    # reserva, o dia todo
   workflow_dispatch:
 
 permissions:
@@ -18,9 +24,11 @@ jobs:
     # Só publica o que está na main, ou seja, o que chegou por merge.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 350  # até 5h30 de espera + publicação; o limite do GitHub é 6 h
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
@@ -28,6 +36,15 @@ jobs:
           cache: pip
 
       - run: pip install -r requirements.txt
+
+      # Só nas execuções agendadas: a manual publica o que já venceu, na hora.
+      - name: Esperar o horário do próximo post (se estiver perto)
+        if: github.event_name == 'schedule'
+        run: python scripts/esperar_proximo.py --max-min 330
+
+      # Durante a espera pode ter entrado um merge (post novo, foto trocada).
+      - name: Atualizar a fila
+        run: git pull --ff-only origin main
 
       - name: Publicar o próximo post vencido
         id: publish

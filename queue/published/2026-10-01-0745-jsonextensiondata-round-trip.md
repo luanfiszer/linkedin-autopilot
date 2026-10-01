@@ -7,6 +7,10 @@ human_score: 76.5
 image_request: "Foto de um rascunho à mão (caderno ou quadro) com os dois processos gravando o mesmo JSON e o campo sumindo no round-trip. Nada de tela nem código do trabalho."
 image: "media/fotos/gerado-json-round-trip.png"
 image_alt: "Infográfico: classe C# sem o campoB regrava o JSON e apaga o campo; [JsonExtensionData] preserva"
+posted_urn: "urn:li:share:7511375699874717696"
+posted_at: "2026-10-01T07:45:21-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQFARXW1w8vKDQ"
 ---
 Aqui está a correção exata que uso quando dois processos escrevem no mesmo JSON. Rouba.
 

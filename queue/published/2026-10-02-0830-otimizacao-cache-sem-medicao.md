@@ -7,6 +7,10 @@ human_score: 71.9
 image_request: "Print do registro de aprendizados ou do ADR do projeto pessoal em que você anotou a remoção do prompt caching (título e o trecho dos 4.096 tokens). Esconda o nome do projeto."
 image: "media/fotos/gerado-cache-medicao.png"
 image_alt: "Infográfico: implementei, subi, medi, derrubei; cache só engata com 4.096 tokens, não 1.024"
+posted_urn: "urn:li:share:7511749413120225280"
+posted_at: "2026-10-02T08:30:22-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQH6yaeNxB3-Cw"
 ---
 Eu aprovei uma otimização de cache e derrubei ela no mesmo dia.
 

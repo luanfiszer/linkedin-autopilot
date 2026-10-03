@@ -7,6 +7,10 @@ human_score: 72.5
 image_request: "Print do ADR em que você decidiu pôr a idempotência numa coluna do Postgres em vez do Redis (título + contexto). Recorte o nome do projeto e caminhos de pasta."
 image: "media/fotos/gerado-idempotencia-fluxo.png"
 image_alt: "Infográfico: reenvio com a mesma chave é recusado pelo índice UNIQUE no Postgres"
+posted_urn: "urn:li:share:7512100474158874624"
+posted_at: "2026-10-03T07:45:21-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQHxM-Jd5xe5Bg"
 ---
 Idempotência com Redis parece resolvida. Até o processo cair no meio do caminho.
 

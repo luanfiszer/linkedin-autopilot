@@ -7,6 +7,10 @@ human_score: 70.1
 image_request: "Print do app Relógio do celular com São Paulo e Reykjavík (que fica em UTC o ano todo) lado a lado, ou foto de um rascunho à mão da linha do tempo. Nada de tela do trabalho."
 image: "media/fotos/gerado-fuso-comparacao.png"
 image_alt: "Infográfico: DateTime volta no fuso do processo e a versão antiga vence; DateTimeOffset corrige"
+posted_urn: "urn:li:share:7512474189119934464"
+posted_at: "2026-10-04T08:30:22-03:00"
+posted_via: "rest/posts"
+posted_image_urn: "urn:li:image:D4D10AQEM-MCBXEmWSA"
 ---
 Um dado antigo estava vencendo um dado novo. O culpado era o fuso horário.
 

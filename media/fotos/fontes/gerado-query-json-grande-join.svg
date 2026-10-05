@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="95" font-size="52" font-weight="700" fill="#1F2A2C">Um JOIN multiplica tudo que vem junto dele</text>
+  <text x="80" y="145" font-size="27" fill="#6B6358">JOIN de alta cardinalidade projetando uma coluna de JSON grande: cada linha repetia o JSON inteiro.</text>
+
+  <!-- cabeçalhos -->
+  <rect x="80" y="200" width="680" height="50" rx="10" fill="#C0563B"/>
+  <text x="420" y="233" font-size="26" font-weight="700" fill="#FFFDF8" text-anchor="middle">ANTES</text>
+  <rect x="840" y="200" width="680" height="50" rx="10" fill="#3E7C78"/>
+  <text x="1180" y="233" font-size="26" font-weight="700" fill="#FFFDF8" text-anchor="middle">DEPOIS</text>
+
+  <!-- coluna antes -->
+  <g font-size="24">
+    <rect x="80" y="280" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="326" text-anchor="middle" fill="#1F2A2C">Consulta principal com JOIN em 3 tabelas</text>
+
+    <rect x="80" y="376" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="422" text-anchor="middle" fill="#1F2A2C">Cada linha do JOIN repete o JSON inteiro</text>
+
+    <rect x="80" y="472" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="518" text-anchor="middle" fill="#1F2A2C">Produto cartesiano cresce com o volume</text>
+
+    <rect x="80" y="568" width="680" height="78" rx="12" fill="#C0563B"/>
+    <text x="420" y="614" text-anchor="middle" font-weight="700" fill="#FFFDF8">Timeout</text>
+  </g>
+  <g stroke="#C0563B" stroke-width="5" stroke-linecap="round">
+    <path d="M420 358 V372"/>
+    <path d="M420 454 V468"/>
+    <path d="M420 550 V564"/>
+  </g>
+  <g fill="#C0563B">
+    <path d="M407 372 l13 14 l13 -14 Z"/>
+    <path d="M407 468 l13 14 l13 -14 Z"/>
+    <path d="M407 564 l13 14 l13 -14 Z"/>
+  </g>
+
+  <!-- coluna depois -->
+  <g font-size="24">
+    <rect x="840" y="280" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="326" text-anchor="middle" fill="#1F2A2C">Consulta principal, sem o JSON</text>
+
+    <rect x="840" y="376" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="422" text-anchor="middle" fill="#1F2A2C">Só os ids das linhas que importam</text>
+
+    <rect x="840" y="472" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="518" text-anchor="middle" fill="#1F2A2C">Busca o JSON numa consulta separada, 1x</text>
+
+    <rect x="840" y="568" width="680" height="78" rx="12" fill="#3E7C78"/>
+    <text x="1180" y="614" text-anchor="middle" font-weight="700" fill="#FFFDF8">Resposta rápida</text>
+  </g>
+  <g stroke="#3E7C78" stroke-width="5" stroke-linecap="round">
+    <path d="M1180 358 V372"/>
+    <path d="M1180 454 V468"/>
+    <path d="M1180 550 V564"/>
+  </g>
+  <g fill="#3E7C78">
+    <path d="M1167 372 l13 14 l13 -14 Z"/>
+    <path d="M1167 468 l13 14 l13 -14 Z"/>
+    <path d="M1167 564 l13 14 l13 -14 Z"/>
+  </g>
+
+  <!-- exemplo ilustrativo -->
+  <rect x="80" y="690" width="680" height="150" rx="14" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="105" y="726" font-size="20" font-weight="700" fill="#6B6358">exemplo ilustrativo</text>
+  <text x="105" y="762" font-family="monospace" font-size="21" fill="#1F2A2C">SELECT p.id, j.dados_json</text>
+  <text x="105" y="790" font-family="monospace" font-size="21" fill="#1F2A2C">FROM Pedido p JOIN Item i JOIN Produto pr</text>
+  <text x="105" y="818" font-family="monospace" font-size="19" fill="#C0563B">-- o JSON repete por linha do JOIN</text>
+
+  <rect x="840" y="690" width="680" height="150" rx="14" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="865" y="726" font-size="20" font-weight="700" fill="#6B6358">exemplo ilustrativo</text>
+  <text x="865" y="762" font-family="monospace" font-size="21" fill="#1F2A2C">SELECT p.id FROM Pedido p JOIN Item i ...</text>
+  <text x="865" y="790" font-family="monospace" font-size="21" fill="#1F2A2C">SELECT id, dados_json FROM Pedido</text>
+  <text x="865" y="818" font-family="monospace" font-size="19" fill="#3E7C78">WHERE id IN (...)  -- 1 vez só</text>
+</svg>

@@ -10,6 +10,7 @@ MEDPlanner
 RealizaProva
 CronogramaAcademico
 AutorizacaoConteudos
+MEDParagon
 # Projeto pessoal: pode ser citado, mas sem o nome
 Voicecoach
 Voice Coach

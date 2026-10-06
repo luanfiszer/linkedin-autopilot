@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="95" font-size="50" font-weight="700" fill="#1F2A2C">Fila de erro configurada não é fila de erro testada</text>
+  <text x="80" y="135" font-size="24" fill="#6B6358">A classe base de todo consumer capturava a exceção antes dela chegar na biblioteca:</text>
+  <text x="80" y="165" font-size="24" fill="#6B6358">a mensagem falhava em silêncio e ninguém via.</text>
+
+  <!-- cabeçalhos -->
+  <rect x="80" y="200" width="680" height="50" rx="10" fill="#C0563B"/>
+  <text x="420" y="233" font-size="26" font-weight="700" fill="#FFFDF8" text-anchor="middle">O QUE QUEBRA</text>
+  <rect x="840" y="200" width="680" height="50" rx="10" fill="#3E7C78"/>
+  <text x="1180" y="233" font-size="26" font-weight="700" fill="#FFFDF8" text-anchor="middle">A CORREÇÃO</text>
+
+  <!-- coluna quebra -->
+  <g font-size="22">
+    <rect x="80" y="280" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="326" text-anchor="middle" fill="#1F2A2C">Handler lança uma exceção</text>
+
+    <rect x="80" y="376" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="414" text-anchor="middle" fill="#1F2A2C" font-family="monospace" font-size="20">ConsumerBase.HandleAsync</text>
+    <text x="420" y="442" text-anchor="middle" fill="#1F2A2C">captura tudo</text>
+
+    <rect x="80" y="472" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="510" text-anchor="middle" fill="#1F2A2C" font-family="monospace" font-size="20">BasicNack(requeue: false)</text>
+    <text x="420" y="538" text-anchor="middle" fill="#1F2A2C">parece um retorno normal</text>
+
+    <rect x="80" y="568" width="680" height="78" rx="12" fill="#C0563B"/>
+    <text x="420" y="606" text-anchor="middle" font-weight="700" fill="#FFFDF8">Trace marca OK</text>
+    <text x="420" y="634" text-anchor="middle" fill="#FFFDF8">Dead-Letter nunca recebe nada</text>
+  </g>
+  <g stroke="#C0563B" stroke-width="5" stroke-linecap="round">
+    <path d="M420 358 V372"/>
+    <path d="M420 454 V468"/>
+    <path d="M420 550 V564"/>
+  </g>
+  <g fill="#C0563B">
+    <path d="M407 372 l13 14 l13 -14 Z"/>
+    <path d="M407 468 l13 14 l13 -14 Z"/>
+    <path d="M407 564 l13 14 l13 -14 Z"/>
+  </g>
+
+  <!-- coluna correção -->
+  <g font-size="22">
+    <rect x="840" y="280" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="326" text-anchor="middle" fill="#1F2A2C">Handler lança uma exceção</text>
+
+    <rect x="840" y="376" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="422" text-anchor="middle" fill="#1F2A2C">ConsumerBase deixa a exceção subir</text>
+
+    <rect x="840" y="472" width="680" height="78" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="518" text-anchor="middle" fill="#1F2A2C">Biblioteca vê a exceção não tratada</text>
+
+    <rect x="840" y="568" width="680" height="78" rx="12" fill="#3E7C78"/>
+    <text x="1180" y="614" text-anchor="middle" font-weight="700" fill="#FFFDF8">Publica a mensagem na Dead-Letter</text>
+  </g>
+  <g stroke="#3E7C78" stroke-width="5" stroke-linecap="round">
+    <path d="M1180 358 V372"/>
+    <path d="M1180 454 V468"/>
+    <path d="M1180 550 V564"/>
+  </g>
+  <g fill="#3E7C78">
+    <path d="M1167 372 l13 14 l13 -14 Z"/>
+    <path d="M1167 468 l13 14 l13 -14 Z"/>
+    <path d="M1167 564 l13 14 l13 -14 Z"/>
+  </g>
+
+  <!-- nota -->
+  <rect x="80" y="690" width="1440" height="130" rx="14" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="105" y="730" font-size="22" font-weight="700" fill="#6B6358">conceito: RabbitMQ fala AMQP</text>
+  <text x="105" y="766" font-size="22" fill="#1F2A2C">nack com requeue desligado não é a mesma coisa que mandar pra Dead-Letter —</text>
+  <text x="105" y="796" font-size="22" fill="#1F2A2C">a biblioteca só faz isso quando a exceção chega até ela.</text>
+</svg>

@@ -1,0 +1,8 @@
+titulo: Timestamp vence, não a ordem de chegada
+caixas:
+  - "Produtor publica com timestamp"
+  - "Fila entrega fora de ordem (ou 2x)"
+  - "Consumidor compara timestamp salvo"
+  - "Mais antigo ou duplicado: ignora"
+destaque: 2
+nota: "Reprocessar a mesma mensagem dez vezes tem que terminar no mesmo estado que entregar ela uma vez."

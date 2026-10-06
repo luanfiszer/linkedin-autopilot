@@ -1,0 +1,9 @@
+titulo: "Ler, conferir, gravar: uma corrida"
+caixas:
+  - "Duas abas pedem refresh do mesmo token"
+  - "Handler lê, confere e só depois revoga"
+  - "Janela entre conferir e revogar"
+  - "UPDATE atômico substitui os 3 passos"
+  - "Só quem recebe a linha venceu a corrida"
+destaque: 3
+nota: "UPDATE tokens SET revoked_at = now() WHERE revoked_at IS NULL RETURNING id"

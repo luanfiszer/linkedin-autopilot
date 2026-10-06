@@ -1,0 +1,9 @@
+titulo: "653 verdes não contam essa história"
+caixas:
+  - "653 testes verdes, 1 aluno só"
+  - "Fixture grava sempre o mesmo aluno"
+  - "Autorização nunca é exercitada"
+  - "Roteiro de QA roda com 2 alunos"
+  - "2 defeitos aparecem em minutos"
+destaque: 3
+nota: "Gates verdes provam que o código é coerente consigo mesmo. Não provam que o produto funciona."

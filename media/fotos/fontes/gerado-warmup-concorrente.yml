@@ -1,0 +1,9 @@
+titulo: "Aquecer é reproduzir a concorrência"
+caixas:
+  - "Warm-up sequencial: 1 conexão pronta"
+  - "k6 sobe carga em paralelo"
+  - "Conexão nova paga TCP, TLS, auth"
+  - "Warm-up virou rajadas concorrentes"
+  - "Endpoint novo já entra aquecido"
+destaque: 3
+nota: "Aquecer é reproduzir a concorrência da medição, não só chamar uma vez."

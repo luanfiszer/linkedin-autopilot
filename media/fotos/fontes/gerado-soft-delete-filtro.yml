@@ -1,0 +1,5 @@
+titulo: Soft delete é um contrato
+caixas: [Registro excluído na origem, Mapeamento sem a coluna de exclusão, "Filtro global: HasQueryFilter", "Exceção explícita: IgnoreQueryFilters"]
+setas: [ainda aparecia pro meu serviço, virou regra uma vez só, só onde preciso ver o excluído]
+destaque: 2
+nota: Filtro por consulta depende de memória. Filtro global transforma esquecer em impossível.

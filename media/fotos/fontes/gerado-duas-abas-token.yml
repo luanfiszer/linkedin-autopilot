@@ -1,0 +1,5 @@
+titulo: A corrida que dois curl em paralelo revelou
+caixas: [Dois refresh ao mesmo tempo, "Lê, confere, revoga: 3 passos", "UPDATE atômico WHERE revoked_at IS NULL", "Só 1 aba renova (Web Locks API)"]
+setas: [os dois recebem token novo, virou 1 passo só, no navegador]
+destaque: 2
+nota: Quem não recebe a linha de volta perdeu a corrida e é tratado como reuso.

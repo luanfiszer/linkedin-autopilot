@@ -1,64 +1,84 @@
-# Plano da semana de 28/09 a 04/10/2026
+# Plano da semana de 19/10 a 25/10/2026
 
-Gerado pela rotina semanal (skill `/li-plan`) em 25/09/2026. Semana-alvo:
-segunda 28/09 a domingo 04/10 (a próxima semana completa a partir de hoje).
+Gerado pela rotina semanal (skill `/li-plan`) em 12/10/2026. Semana-alvo:
+segunda 19/10 a domingo 25/10 (a próxima semana completa a partir de hoje,
+12/10/2026, que é segunda-feira).
 
 Fontes usadas: `linkedin/voice.md` (posições e provas públicas) e o diário
-técnico de `linkedin/ideias.md` (coleta de 25/09/2026). A seção "Esta semana"
-de `ideias.md` estava vazia.
+técnico de `linkedin/ideias.md` (coletas de 25/09, 28/09 e 05/10/2026). A
+seção "Esta semana" de `ideias.md` estava vazia.
 
 ```
-SEMANA DE 28/09
+SEMANA DE 19/10
 
 SEG  -
-TER  08:15  PROOF    #12 The Comparison     - o sistema de tickets da PROVER vs a ferramenta paga que ele substituiu
-QUA  08:00  OPINION  #1  Contrarian Take    - Outbox não é exagero: publicar evento logo após salvar no banco é bug esperando acontecer
-QUI  07:45  TEACH    #11 Myth Bust          - Redis não resolve idempotência sozinho: banco como fonte da verdade, fila/cache como aceleradores
-SEX  08:30  STORY    #9  Story Cold Open    - o registro "mais recente" que na verdade era o mais antigo (bug de fuso com DateTimeOffset)
+TER  08:15  PROOF    #2  Number Reveal      - o prompt do tradutor testado em 90 execuções: 10 erros antes, 0 depois
+QUA  07:45  OPINION  #18 Unpopular Rule     - remendo temporário não pode contaminar o dado persistido
+QUI  08:30  TEACH    #16 Good vs Great      - soft delete é um contrato; filtro global em vez de lembrar em cada consulta
+SEX  07:45  STORY    #19 Curiosity Gap      - o bug de corrida que só apareceu rodando dois comandos iguais ao mesmo tempo
 SAB  -
 DOM  -
 ```
 
 ## Detalhe de cada slot
 
-1. **TER 29/09, 08:15 — PROOF — #12 The Comparison**
-   Ângulo: o sistema de gestão de tickets que fiz do zero na PROVER (C#,
-   ASP.NET MVC) substituiu uma ferramenta paga. Custo operacional caiu 97,5%,
-   sobrou só infraestrutura. Fato público de `voice.md` (seção "Provas que
-   posso usar"), não é da MEDGRUPO. Nenhum `{{...}}` necessário.
+1. **TER 20/10, 08:15 — PROOF — #2 Number Reveal**
+   Ângulo: no botão de tradução do projeto pessoal (app de inglês, sem citar
+   o nome), o modelo às vezes respondia à pergunta do professor virtual em
+   vez de traduzir. Medi em 90 execuções: o prompt antigo errou 10 (11%); a
+   correção (delimitar o texto e tratar o conteúdo delimitado como dado, não
+   instrução) zerou os erros nas 90 novas. As duas rodadas custaram US$ 0,063
+   juntas. O adaptador ganhou 7 testes, 3 deles falham na versão antiga.
+   Fonte: `ideias.md`, diário técnico de 05/10 ("A tradução que respondia em
+   vez de traduzir"). Números reais, medidos, do projeto pessoal — `voice.md`
+   autoriza usar números dele. Nenhum `{{...}}` necessário.
 
-2. **QUA 30/09, 08:00 — OPINION — #1 Contrarian Take**
-   Ângulo: publicar evento logo depois de salvar no banco é bug esperando
-   acontecer; Outbox Pattern não é over-engineering. Base: posição #2 de
-   `voice.md`, apoiada no formato já autorizado ali ("implementei Outbox
-   Pattern num consumer RabbitMQ; evento perdia quando o banco confirmava e a
-   publicação falhava"). Sem nome de empresa, sem número interno.
+2. **QUA 21/10, 07:45 — OPINION — #18 Unpopular Rule**
+   Ângulo: uma correção redundante enquanto um serviço upstream corrigia um
+   veredito inconsistente. A posição: remendo temporário não pode contaminar
+   o dado persistido — grava-se só o dado de entrada e a regra se aplica na
+   leitura; se tirar o remendo depois exige migração, ele nunca foi
+   temporário. Fonte: `ideias.md`, diário técnico de 28/09 ("Gambiarra
+   provisória desenhada para ser apagada"), já sanitizado (sem nome de
+   sistema, sem número interno, trata só da técnica e da decisão). Sem
+   `{{...}}`.
 
-3. **QUI 01/10, 07:45 — TEACH — #11 Myth Bust**
-   Ângulo: uma das "outras ideias" listadas em `voice.md` — idempotência numa
-   coluna do Postgres em vez de Redis `SETNX`, motivada por uma janela de
-   crash entre criar o registro e enfileirar. Fonte: história do projeto
-   pessoal (app de treino de inglês, sem citar o nome), que `voice.md`
-   autoriza usar com números e detalhes. Trocado no lugar do item do diário
-   técnico sobre `JsonExtensionData` porque este último não tinha material
-   concreto suficiente (números/nomes públicos) para passar no `detect.py`
-   sem enfraquecer o texto.
+3. **QUI 22/10, 08:30 — TEACH — #16 Good vs Great**
+   Ângulo: soft delete que a entidade não conhecia — um registro excluído na
+   origem continuava aparecendo porque o mapeamento não declarava a coluna de
+   exclusão. A lição ensinável: tratar soft delete como contrato, com filtro
+   global de consulta (EF Core `HasQueryFilter`) por padrão e
+   `IgnoreQueryFilters` só onde precisa ver o excluído, em vez de confiar que
+   cada consulta vai lembrar de filtrar. Fonte: `ideias.md`, diário técnico de
+   05/10 ("Soft delete que a entidade não conhecia"), sanitizado (sem nome de
+   tabela ou sistema). Sem `{{...}}`.
 
-4. **SEX 02/10, 08:30 — STORY — #9 Story Cold Open**
-   Ângulo: item do diário técnico — bug de fuso com o modo legado de
-   timestamps do driver do PostgreSQL: um `DateTime` voltava no fuso do
-   processo, uma consolidação mais antiga parecia mais nova e sobrescrevia a
-   certa. Só apareceu num ambiente real, nunca nos testes locais. Correção:
-   trocar para `DateTimeOffset` e teste de regressão com data em -03:00.
-   Sanitizado, sem nome de sistema ou número interno.
+4. **SEX 23/10, 07:45 — STORY — #19 Curiosity Gap**
+   Ângulo: ao desenhar a sessão da versão web do projeto pessoal, rodei dois
+   `curl` em paralelo pedindo refresh com o mesmo token — os dois receberam
+   token novo. Causa: o handler lia, conferia revogação e só depois revogava
+   (check-then-act), uma corrida clássica. Correção: um único
+   `UPDATE ... WHERE revoked_at IS NULL RETURNING id` atômico, cookie
+   `HttpOnly`/`SameSite=Strict` e só uma aba renovando por vez via Web Locks
+   API (`navigator.locks`). Fonte: `ideias.md`, diário técnico de 05/10
+   ("Duas abas renovando o token ao mesmo tempo"), projeto pessoal. Sem
+   `{{...}}`.
 
-Mix respeitado: PROOF, OPINION, TEACH e STORY, um por dia, nunca dois do
-mesmo tipo seguidos, máximo 1 post por dia, todos em horário de pico
-(terça a quinta) exceto o quarto, que foi para sexta de manhã (segunda opção
-da skill) para fechar com STORY sem cair no fim de semana.
+## Observações sobre o mix e a não-repetição
 
-Sem repetição de tema: não há posts publicados de verdade ainda (só um post
-de teste em `queue/published/`), e `queue/approved/` está vazio.
-
-Não há lista de engajamento nesta rotina (fora do escopo do CLAUDE.md deste
-repositório — a rotina semanal só cobre posts).
+- Mix: PROOF, OPINION, TEACH, STORY — um de cada, nenhum tipo repetido, nunca
+  dois do mesmo tipo em sequência.
+- Nenhum tema, gancho ou história repete o que já saiu em `queue/published/`
+  nas últimas duas semanas (Outbox Pattern, N+1/LINQ, disciplina com agente
+  de IA/ADR, `JsonExtensionData` round-trip, cache sem medição, idempotência
+  Postgres vs Redis, bug de fuso `DateTimeOffset`). Ganchos já usados nesse
+  período (#1, #9, #10, #11, #15, #20, #21) foram evitados; esta semana usa
+  #2, #16, #18 e #19, nenhum repetido antes.
+  `queue/approved/` está vazio, então não há conflito de data com posts já
+  agendados.
+- Horários só de manhã (7h30–9h30, America/Sao_Paulo), terça a quinta na
+  preferência e sexta como segunda opção, no máximo 1 post por dia, como
+  exige o `CLAUDE.md` deste repositório (o fuso do público é o mesmo do
+  usuário).
+- Sem lista de engajamento: fora do escopo da rotina semanal deste
+  repositório (`CLAUDE.md` só cobre os 4 posts).

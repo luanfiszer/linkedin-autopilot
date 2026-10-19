@@ -1,0 +1,5 @@
+titulo: Troquei a ferramenta paga por um sistema próprio
+caixas: ["Ferramenta paga, cobrada todo mês", "Só usava uma fração dela", "Sistema próprio em C# / ASP.NET MVC", "Custo operacional cai 97,5%"]
+setas: ["cobrava pela função inteira", "decisão: construir sob medida", "licença sai, só sobra infra"]
+destaque: 3
+nota: "Autenticação, controle de acesso por perfil e histórico de atendimentos: só o que o time usava."

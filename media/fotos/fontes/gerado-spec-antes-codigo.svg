@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="95" font-size="50" font-weight="700" fill="#1F2A2C">A spec que acha o bug antes do código</text>
+  <text x="80" y="135" font-size="25" fill="#6B6358">Correções que pareciam pequenas, escritas em formato OpenSpec antes do código, essa semana.</text>
+
+  <!-- cabeçalhos -->
+  <rect x="80" y="190" width="680" height="50" rx="10" fill="#C0563B"/>
+  <text x="420" y="223" font-size="25" font-weight="700" fill="#FFFDF8" text-anchor="middle">SEM SPEC</text>
+  <rect x="840" y="190" width="680" height="50" rx="10" fill="#3E7C78"/>
+  <text x="1180" y="223" font-size="25" font-weight="700" fill="#FFFDF8" text-anchor="middle">COM SPEC (OpenSpec)</text>
+
+  <!-- coluna sem spec -->
+  <g font-size="21">
+    <rect x="80" y="266" width="680" height="72" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="308" text-anchor="middle" fill="#1F2A2C">Bug parece simples</text>
+
+    <rect x="80" y="356" width="680" height="72" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="398" text-anchor="middle" fill="#1F2A2C">Direto pro código, sem design</text>
+
+    <rect x="80" y="446" width="680" height="72" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="420" y="488" text-anchor="middle" fill="#1F2A2C">Teste cobre só o caminho feliz</text>
+
+    <rect x="80" y="536" width="680" height="80" rx="12" fill="#C0563B"/>
+    <text x="420" y="576" text-anchor="middle" font-weight="700" fill="#FFFDF8">Caso de borda aparece</text>
+    <text x="420" y="602" text-anchor="middle" fill="#FFFDF8">em produção</text>
+  </g>
+  <g stroke="#C0563B" stroke-width="5" stroke-linecap="round">
+    <path d="M420 338 V352"/>
+    <path d="M420 428 V442"/>
+    <path d="M420 518 V532"/>
+  </g>
+  <g fill="#C0563B">
+    <path d="M407 352 l13 14 l13 -14 Z"/>
+    <path d="M407 442 l13 14 l13 -14 Z"/>
+    <path d="M407 532 l13 14 l13 -14 Z"/>
+  </g>
+
+  <!-- coluna com spec -->
+  <g font-size="21">
+    <rect x="840" y="266" width="680" height="72" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="308" text-anchor="middle" fill="#1F2A2C">Bug parece simples</text>
+
+    <rect x="840" y="356" width="680" height="72" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="398" text-anchor="middle" fill="#1F2A2C">Proposta, design e spec, antes do código</text>
+
+    <rect x="840" y="446" width="680" height="72" rx="12" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+    <text x="1180" y="488" text-anchor="middle" fill="#1F2A2C">Casos de borda listados no papel</text>
+
+    <rect x="840" y="536" width="680" height="80" rx="12" fill="#3E7C78"/>
+    <text x="1180" y="576" text-anchor="middle" font-weight="700" fill="#FFFDF8">Caso que ia quebrar aparece</text>
+    <text x="1180" y="602" text-anchor="middle" fill="#FFFDF8">antes do primeiro commit</text>
+  </g>
+  <g stroke="#3E7C78" stroke-width="5" stroke-linecap="round">
+    <path d="M1180 338 V352"/>
+    <path d="M1180 428 V442"/>
+    <path d="M1180 518 V532"/>
+  </g>
+  <g fill="#3E7C78">
+    <path d="M1167 352 l13 14 l13 -14 Z"/>
+    <path d="M1167 442 l13 14 l13 -14 Z"/>
+    <path d="M1167 532 l13 14 l13 -14 Z"/>
+  </g>
+
+  <!-- nota -->
+  <rect x="80" y="660" width="1440" height="150" rx="14" fill="#FFFDF8" stroke="#D9CFBF" stroke-width="3"/>
+  <text x="105" y="700" font-size="23" font-weight="700" fill="#6B6358">conceito: decidir arquitetura sobre código que não existe ainda é aposta</text>
+  <text x="105" y="736" font-size="23" fill="#1F2A2C">A spec vira uma lista de casos pra checar, um por um, antes do primeiro</text>
+  <text x="105" y="768" font-size="23" fill="#1F2A2C">commit, em vez de descobrir cada um deles direto em produção.</text>
+</svg>

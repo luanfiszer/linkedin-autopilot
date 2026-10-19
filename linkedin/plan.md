@@ -1,64 +1,92 @@
-# Plano da semana de 28/09 a 04/10/2026
+# Plano da semana de 26/10 a 01/11/2026
 
-Gerado pela rotina semanal (skill `/li-plan`) em 25/09/2026. Semana-alvo:
-segunda 28/09 a domingo 04/10 (a próxima semana completa a partir de hoje).
+Gerado pela rotina semanal (skill `/li-plan`) em 19/10/2026 (segunda-feira).
+Semana-alvo: segunda 26/10 a domingo 01/11 (a próxima semana completa a
+partir de hoje).
 
-Fontes usadas: `linkedin/voice.md` (posições e provas públicas) e o diário
-técnico de `linkedin/ideias.md` (coleta de 25/09/2026). A seção "Esta semana"
-de `ideias.md` estava vazia.
+Fontes usadas: `linkedin/voice.md` (posições, provas públicas) e o diário
+técnico de `linkedin/ideias.md` (coletas de 25/09, 28/09 e 05/10/2026). A
+seção "Esta semana" de `ideias.md` está vazia.
 
 ```
-SEMANA DE 28/09
+SEMANA DE 26/10
 
 SEG  -
-TER  08:15  PROOF    #12 The Comparison     - o sistema de tickets da PROVER vs a ferramenta paga que ele substituiu
-QUA  08:00  OPINION  #1  Contrarian Take    - Outbox não é exagero: publicar evento logo após salvar no banco é bug esperando acontecer
-QUI  07:45  TEACH    #11 Myth Bust          - Redis não resolve idempotência sozinho: banco como fonte da verdade, fila/cache como aceleradores
-SEX  08:30  STORY    #9  Story Cold Open    - o registro "mais recente" que na verdade era o mais antigo (bug de fuso com DateTimeOffset)
+TER  08:15  PROOF    #12 The Comparison     - o sistema de tickets que fiz do zero na PROVER vs a ferramenta paga que ele substituiu
+QUA  07:45  OPINION  #7  The Callout        - escrever a spec antes do código, mesmo numa correção que parece pequena
+QUI  08:30  TEACH    #8  Question Trap      - progresso de usuário casado por identidade, não por posição
+SEX  08:00  STORY    #14 Pattern Interrupt  - o desafio final de trainee: API REST com Clean Architecture apresentada ao vivo pra banca
 SAB  -
 DOM  -
 ```
 
 ## Detalhe de cada slot
 
-1. **TER 29/09, 08:15 — PROOF — #12 The Comparison**
-   Ângulo: o sistema de gestão de tickets que fiz do zero na PROVER (C#,
-   ASP.NET MVC) substituiu uma ferramenta paga. Custo operacional caiu 97,5%,
-   sobrou só infraestrutura. Fato público de `voice.md` (seção "Provas que
-   posso usar"), não é da MEDGRUPO. Nenhum `{{...}}` necessário.
+1. **TER 27/10, 08:15 — PROOF — #12 The Comparison**
+   Ângulo: na PROVER (emprego anterior ao atual, não é a MEDGRUPO), fiz do
+   zero, em C# e ASP.NET MVC, um sistema interno de gestão de tickets que
+   substituiu uma ferramenta paga. Custo operacional caiu 97,5%, sobrou só o
+   custo de infraestrutura. Tinha autenticação, controle de acesso e
+   histórico de atendimentos. Fato público de `voice.md` ("Provas que posso
+   usar"). Nenhum `{{...}}` necessário.
 
-2. **QUA 30/09, 08:00 — OPINION — #1 Contrarian Take**
-   Ângulo: publicar evento logo depois de salvar no banco é bug esperando
-   acontecer; Outbox Pattern não é over-engineering. Base: posição #2 de
-   `voice.md`, apoiada no formato já autorizado ali ("implementei Outbox
-   Pattern num consumer RabbitMQ; evento perdia quando o banco confirmava e a
-   publicação falhava"). Sem nome de empresa, sem número interno.
+2. **QUA 28/10, 07:45 — OPINION — #7 The Callout**
+   Ângulo: nas correções maiores da semana (relato sanitizado, sem nome de
+   sistema), escrevi proposta, design e spec (formato OpenSpec) antes de
+   tocar no código — o que ia mudar, os casos de borda, o roteiro de
+   validação em homologação. Foi assim, no papel, que um caso que ia quebrar
+   apareceu antes de qualquer linha de código mudar. Posição: pular o design
+   numa correção "pequena" é a parte mais cara de um bug maior. Apoiada
+   também na ideia já registrada em `voice.md` ("não decidir arquitetura
+   sobre código que ainda não existe"). Fonte: `ideias.md`, diário técnico de
+   25/09 ("Spec antes do fix"). Sem `{{...}}`.
 
-3. **QUI 01/10, 07:45 — TEACH — #11 Myth Bust**
-   Ângulo: uma das "outras ideias" listadas em `voice.md` — idempotência numa
-   coluna do Postgres em vez de Redis `SETNX`, motivada por uma janela de
-   crash entre criar o registro e enfileirar. Fonte: história do projeto
-   pessoal (app de treino de inglês, sem citar o nome), que `voice.md`
-   autoriza usar com números e detalhes. Trocado no lugar do item do diário
-   técnico sobre `JsonExtensionData` porque este último não tinha material
-   concreto suficiente (números/nomes públicos) para passar no `detect.py`
-   sem enfraquecer o texto.
+3. **QUI 29/10, 08:30 — TEACH — #8 Question Trap**
+   Ângulo: quando o conteúdo de uma etapa era reconstruído, o progresso do
+   usuário passava pro novo conteúdo sempre que havia exatamente um item
+   antes e um depois — heurística de posição. Se o item tinha sido trocado,
+   o usuário herdava progresso de algo que nunca fez; etapa vazia ainda
+   contava. Correção: o progresso só passa adiante se o conjunto de ids for
+   o mesmo (comparado ordenado). Lição ensinável: estado do usuário se casa
+   por identidade, nunca por posição. Fonte: `ideias.md`, diário técnico de
+   05/10 ("Progresso casado por posição, não por identidade"), já sanitizado
+   (sem nome de sistema ou tabela). Sem `{{...}}`.
 
-4. **SEX 02/10, 08:30 — STORY — #9 Story Cold Open**
-   Ângulo: item do diário técnico — bug de fuso com o modo legado de
-   timestamps do driver do PostgreSQL: um `DateTime` voltava no fuso do
-   processo, uma consolidação mais antiga parecia mais nova e sobrescrevia a
-   certa. Só apareceu num ambiente real, nunca nos testes locais. Correção:
-   trocar para `DateTimeOffset` e teste de regressão com data em -03:00.
-   Sanitizado, sem nome de sistema ou número interno.
+4. **SEX 30/10, 08:00 — STORY — #14 Pattern Interrupt**
+   Ângulo: na seleção de trainee, passei por etapas eliminatórias (lógica,
+   console, APIs) e o desafio final foi uma API REST de locadora de veículos
+   com Clean Architecture, apresentada ao vivo para a banca. Fato público de
+   `voice.md`. Nenhum `{{...}}` necessário.
 
-Mix respeitado: PROOF, OPINION, TEACH e STORY, um por dia, nunca dois do
-mesmo tipo seguidos, máximo 1 post por dia, todos em horário de pico
-(terça a quinta) exceto o quarto, que foi para sexta de manhã (segunda opção
-da skill) para fechar com STORY sem cair no fim de semana.
+## Observações sobre o mix e a não-repetição
 
-Sem repetição de tema: não há posts publicados de verdade ainda (só um post
-de teste em `queue/published/`), e `queue/approved/` está vazio.
+- Mix: PROOF, OPINION, TEACH, STORY — um de cada, nenhum tipo repetido,
+  nunca dois do mesmo tipo em sequência.
+- Nenhum tema, gancho ou história repete o que já saiu em `queue/published/`
+  ou no `log.md` (Outbox Pattern, N+1/LINQ, disciplina com agente de
+  IA/ADR, `JsonExtensionData` round-trip, cache sem medição, idempotência
+  Postgres vs Redis, bug de fuso `DateTimeOffset` — hooks #1, #9, #10, #11,
+  #15, #20, #21). `queue/approved/` está vazio em `main`, então não há
+  conflito de data com posts já agendados ali.
+- Como complemento (não exigido pelo `CLAUDE.md`, mas evita repetição óbvia
+  quando os PRs pendentes forem revisados): também evitei os temas e os
+  ganchos já usados nos PRs #10, #11, #12 e #13 (ainda abertos, sem merge) —
+  warm-up/k6, contrato de mensageria em bytes, 653 testes/1 aluno, soft
+  delete com filtro global, fila de erro vazia, timestamp vs ordem de
+  chegada, fallback que fecha por padrão, tradução delimitada por marcas,
+  remendo que não toca o dado persistido, corrida de refresh token
+  (ganchos #2, #3, #4, #5, #6, #16, #17, #18, #19). Esta semana usa #7, #8,
+  #12 e #14, nenhum deles usado antes em post publicado ou em PR aberto.
+- Horários só de manhã (7h30–9h30, America/Sao_Paulo), terça a sexta, no
+  máximo 1 post por dia.
+- Sem lista de engajamento: fora do escopo da rotina semanal deste
+  repositório (`CLAUDE.md` só cobre os 4 posts).
 
-Não há lista de engajamento nesta rotina (fora do escopo do CLAUDE.md deste
-repositório — a rotina semanal só cobre posts).
+## Ideias do diário técnico ainda não usadas (ficam pra depois)
+
+- Documento derivado que também guarda estado (reconstrução zerava progresso).
+- Revert antes de acertar (vínculo inferido por nome vira registro órfão).
+- Correção manual de dados vira regra versionada (normalização + teste dbt).
+- Provas de `voice.md` ainda não usadas: PROVER chat em legado (Long
+  Polling/AJAX); microsserviços de autenticação do MEDGRUPO (JWT, MFA,
+  geofencing, detecção de VPN, migração de hash — só no nível de conceito).

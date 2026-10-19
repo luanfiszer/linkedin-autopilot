@@ -1,0 +1,5 @@
+titulo: Da seleção de trainee ao desafio final
+caixas: ["Lógica de programação", "Desafio em console", "Desafio de APIs", "Desafio final: API REST com Clean Architecture", "Apresentação ao vivo pra banca"]
+setas: ["etapa eliminatória", "etapa eliminatória", "por que cada camada existe?", "o que quebra se eu remover uma?"]
+destaque: 4
+nota: "Desafio final: API REST de locadora de veículos, com Clean Architecture."

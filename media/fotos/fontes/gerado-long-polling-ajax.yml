@@ -1,0 +1,5 @@
+titulo: "Tempo real sem WebSocket: Long Polling"
+caixas: ["Cliente abre uma requisição HTTP", "Servidor espera: mensagem nova ou timeout", "Resposta volta na hora que chega algo", "Cliente já abre a próxima, na mesma hora"]
+setas: ["sem resposta ainda", "mensagem chega (ou vence o tempo)", "sem esperar o cliente pedir de novo"]
+destaque: 3
+nota: "Sem conexão permanente: uma fila curta de requisições HTTP, com AJAX repetindo a troca."

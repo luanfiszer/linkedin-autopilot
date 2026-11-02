@@ -1,0 +1,5 @@
+titulo: "A correção manual que virou regra testada"
+caixas: ["UPDATE manual a cada divergência encontrada", "Regras da planilha viram um model dbt", "Normalização do caminho antes de comparar", "Teste not_null roda no CI a cada PR"]
+setas: ["repete o trabalho na próxima vez", "comparação de verdade, não visual", "garante contra regressão"]
+destaque: 4
+nota: "Antes de trocar, o resultado foi conferido linha por linha contra o UPDATE antigo: idêntico."

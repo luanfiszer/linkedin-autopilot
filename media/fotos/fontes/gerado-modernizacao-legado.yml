@@ -1,0 +1,5 @@
+titulo: "O que eu construo"
+caixas: ["Sistema legado", "Microsserviço em ASP.NET Core", "Autenticação: JWT + MFA", "Mensageria: RabbitMQ + Outbox"]
+setas: ["modernizo parte por parte", "cada serviço cuida de uma parte", "comunicação assíncrona"]
+destaque: 1
+nota: "Modernizo sistema legado migrando parte por parte, sem reescrever tudo de uma vez."

@@ -1,0 +1,5 @@
+titulo: "Quando a abstração nasce"
+caixas: ["1º caso de uso real", "Código concreto, sem camada extra", "2º caso de uso aparece", "Abstração nasce aqui"]
+setas: ["resolve direto", "se repete de outro jeito", "generaliza"]
+destaque: 3
+nota: "Abstração antes do segundo caso é aposta, não economia."

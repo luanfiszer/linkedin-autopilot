@@ -1,0 +1,5 @@
+titulo: "Antes de postar um resultado"
+caixas: ["Mudança no código", "Mede: tracing ou benchmark", "Bate com a premissa?", "Mantém ou desfaz"]
+setas: ["implementa", "mede antes/depois", "compara"]
+destaque: 2
+nota: "Sem essa etapa, resultado é só palpite."

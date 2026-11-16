@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" font-family="sans-serif">
+  <rect width="1600" height="900" fill="#F3EEE4"/>
+  <text x="80" y="90" font-size="50" font-weight="700" fill="#1F2A2C">Aquecer não é chamar uma vez</text>
+  <text x="80" y="135" font-size="26" fill="#6B6358">Teste de carga (k6): o warm-up precisa reproduzir a concorrência da medição.</text>
+
+  <!-- ANTES -->
+  <rect x="80" y="190" width="1440" height="260" rx="16" fill="#C0563B"/>
+  <text x="115" y="235" font-size="30" font-weight="700" fill="#FFFDF8">Antes: warm-up sequencial</text>
+  <text x="115" y="268" font-size="22" fill="#FFFDF8">endpoints chamados um de cada vez, esperando cada resposta</text>
+
+  <rect x="115" y="295" width="150" height="90" rx="10" fill="#FFFDF8"/>
+  <text x="190" y="348" font-family="monospace" font-size="26" fill="#1F2A2C" text-anchor="middle">GET /a</text>
+  <path d="M275 340 H330" stroke="#FFFDF8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M316 326 l15 14 l-15 14" fill="none" stroke="#FFFDF8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="345" y="295" width="150" height="90" rx="10" fill="#FFFDF8"/>
+  <text x="420" y="348" font-family="monospace" font-size="26" fill="#1F2A2C" text-anchor="middle">GET /b</text>
+  <path d="M505 340 H560" stroke="#FFFDF8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M546 326 l15 14 l-15 14" fill="none" stroke="#FFFDF8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="575" y="295" width="150" height="90" rx="10" fill="#FFFDF8"/>
+  <text x="650" y="348" font-family="monospace" font-size="26" fill="#1F2A2C" text-anchor="middle">GET /c</text>
+
+  <rect x="900" y="295" width="580" height="90" rx="10" fill="#FFFDF8" stroke="#1F2A2C" stroke-width="2"/>
+  <text x="935" y="335" font-size="22" fill="#1F2A2C">pool do Npgsql</text>
+  <rect x="935" y="350" width="26" height="26" fill="#3E7C78"/>
+  <rect x="970" y="350" width="26" height="26" fill="none" stroke="#6B6358" stroke-width="2"/>
+  <rect x="1005" y="350" width="26" height="26" fill="none" stroke="#6B6358" stroke-width="2"/>
+  <rect x="1040" y="350" width="26" height="26" fill="none" stroke="#6B6358" stroke-width="2"/>
+  <text x="1090" y="370" font-size="20" fill="#6B6358">1 conexão pronta</text>
+
+  <text x="115" y="425" font-size="24" fill="#FFFDF8">Quando o k6 sobe vários usuários, conexão nova abre no meio da medição.</text>
+
+  <!-- DEPOIS -->
+  <rect x="80" y="480" width="1440" height="290" rx="16" fill="#3E7C78"/>
+  <text x="115" y="525" font-size="30" font-weight="700" fill="#FFFDF8">Depois: warm-up em rajadas concorrentes (Task.WhenAll)</text>
+  <text x="115" y="558" font-size="22" fill="#FFFDF8">mesmos endpoints que o k6 mede, disparados juntos</text>
+
+  <rect x="115" y="585" width="150" height="90" rx="10" fill="#FFFDF8"/>
+  <text x="190" y="638" font-family="monospace" font-size="26" fill="#1F2A2C" text-anchor="middle">GET /a</text>
+  <rect x="285" y="585" width="150" height="90" rx="10" fill="#FFFDF8"/>
+  <text x="360" y="638" font-family="monospace" font-size="26" fill="#1F2A2C" text-anchor="middle">GET /b</text>
+  <rect x="455" y="585" width="150" height="90" rx="10" fill="#FFFDF8"/>
+  <text x="530" y="638" font-family="monospace" font-size="26" fill="#1F2A2C" text-anchor="middle">GET /c</text>
+  <path d="M265 630 H900 M435 630 V585 M435 630 V585" stroke="#FFFDF8" stroke-width="0" />
+
+  <rect x="900" y="585" width="580" height="90" rx="10" fill="#FFFDF8" stroke="#1F2A2C" stroke-width="2"/>
+  <text x="935" y="625" font-size="22" fill="#1F2A2C">pool do Npgsql</text>
+  <rect x="935" y="640" width="26" height="26" fill="#3E7C78"/>
+  <rect x="970" y="640" width="26" height="26" fill="#3E7C78"/>
+  <rect x="1005" y="640" width="26" height="26" fill="#3E7C78"/>
+  <rect x="1040" y="640" width="26" height="26" fill="#3E7C78"/>
+  <text x="1090" y="660" font-size="20" fill="#1F2A2C">pool já aquecido</text>
+
+  <text x="115" y="715" font-size="24" fill="#FFFDF8">+ SemaphoreSlim (limite do pool) e CancellationTokenSource (timeout por chamada)</text>
+  <text x="115" y="745" font-size="22" fill="#FFFDF8">catálogo de endpoints lido do próprio teste: endpoint novo já entra aquecido</text>
+
+  <text x="80" y="825" font-size="26" fill="#1F2A2C">O p95 instável não tinha padrão porque a causa era o estado do pool, não o código do endpoint.</text>
+</svg>

@@ -1,0 +1,5 @@
+titulo: Gates verdes não provam que o produto funciona
+caixas: ["653 testes verdes (lint, tipos, cobertura)", "Fixture de teste com 1 aluno só", "Roteiro de QA manual: 31 verificações", "2 bugs reais achados em minutos"]
+setas: ["tudo passa", "autorização nunca é exercitada", "QA com um 2º aluno acha"]
+destaque: 3
+nota: "Correção: dono do recurso virou campo obrigatório do caso de uso."
